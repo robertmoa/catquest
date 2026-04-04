@@ -6,11 +6,16 @@
     <title>CatQuest</title>
     <link rel="stylesheet" href="main.css">
 </head>
-<body>
+<div style="display:none;">
+<img id="playersprite" src="catsprite.png" alt="Description">
+</div>
+
+<body onload = "startgame()">
 <h1>CatQuest</h1>
-<canvas id="gamecanvas" width="320" height="240" style="border-radius: 25px;
+<canvas id="gamecanvas" width="720" height="480" style="border-radius: 25px;
   border: 8px solid #83769C;">
 
 </canvas>
+<script src="main.js"></script>
 </body>
 </html>

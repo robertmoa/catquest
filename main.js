@@ -2,6 +2,12 @@ const p_sprite = document.getElementById("playersprite")
 const pressedKeys = new Set();
 vel = 2;
 
+class vector{
+    costructor(x,y){
+        this.x = x;
+        this.y = y;
+    }
+}
 class cat{
     constructor(x,y,img,username){
         this.x = x
@@ -9,6 +15,7 @@ class cat{
         this.img = img
         this.username = username
     }
+    velocity = new vector(0,0);
 }
 document.addEventListener('keydown', (event) => {
         pressedKeys.add(event.code); // Use event.code for consistency
@@ -57,6 +64,7 @@ function updatescreen(){
     if (pressedKeys.has('KeyD')){
         mycat.x +=vel
     }
+    
     
     
 }
