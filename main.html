@@ -11,7 +11,52 @@
 <a href="shop.html">Shop</a>
 <canvas id="gamecanvas" width="320" height="240" style="border-radius: 25px;
   border: 8px solid #83769C;">
+<!--Loads all images used for the game, hiddenly-->
+<div style="display:none;">
+<img id="playersprite" src="catsprite.png" alt="Description">
+</div>
 
-</canvas>
+<!--main body-->
+<body onload = "startgame()">
+<!--navigation bar-->
+
+
+<!--Main elements, the game window and the chatbox-->
+<div class="container-fluid px-3 ">
+  <div class="row">
+    <div class="col">
+      <div class="p-3">
+        <nav class="navbar navbar-expand navbar-light bg-grey border border-4 border-light-subtle rounded-3">
+          <span class="navbar-brand px-3 h1 mb-0"><span class="text-light-emphasis">Cat</span>Quest</span>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- Game -->
+    <div class="col-7">
+      <div class="ratio ratio-4x3">
+        <canvas class="border border-4 border-light-subtle rounded-3" id="gamecanvas" width="720" height="480"></canvas>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="col d-flex flex-column 60vh">
+      <!--Chatbox-->
+      <div id="chat_box" class="flex-grow-1 overflow-auto border border-4 border-light-subtle rounded-3 fs-4"> </div>
+      
+      <div class="d-flex p-2 gap-2">
+        <input id="input_send" class="form-control" type="text" placeholder="Type a message..." />
+        <!--Send button-->
+        <button id="btn_send" class="btn btn-outline-secondary" type="submit" >Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="main.js"></script>
+<script src="chat.js"></script>
 </body>
 </html>
