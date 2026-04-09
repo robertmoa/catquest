@@ -1,0 +1,49 @@
+body {
+  background: linear-gradient(180deg, #f8f9fa 0%, #eef3f8 100%);
+}
+
+.shop-page {
+  max-width: 1200px;
+}
+
+.shop-navbar {
+  backdrop-filter: blur(8px);
+}
+
+.shop-feature-card,
+.shop-item-card {
+  background-color: rgba(255, 255, 255, 0.96);
+}
+
+.shop-subtitle {
+  max-width: 38ch;
+}
+
+.shop-item-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shop-item-card:hover {
+  transform: translateY(-4px);
+}
+
+.shop-item-image {
+  height: 220px;
+  object-fit: cover;
+}
+
+.shop-item-image-contain {
+  object-fit: contain;
+}
+
+@media (max-width: 991.98px) {
+  .shop-header {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .shop-subtitle {
+    max-width: none;
+  }
+}
