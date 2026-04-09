@@ -49,10 +49,28 @@ function renderShopGold() {
 }
 
 function buyShopItem(cost, itemName) {
+    const confirmationPrompts = itemName === "Sword of Uncertantity"
+        ? [
+            "Are you sure you want to purchase this sword",
+            "Youre 100% certain?",
+            "But are you really sure? Like deadset you know you want this",
+            "This is your fourth confirmation. You must really want this, right?",
+            "Last chance! Theres no going back now"
+        ]
+        : ["Are you sure you want to buy " + itemName + " for " + cost + " gold?"];
+
+    for (const promptMessage of confirmationPrompts) {
+        const confirmedPurchase = window.confirm(promptMessage);
+
+        if (!confirmedPurchase) {
+            return false;
+        }
+    }
+
     const wasPurchased = spendPlayerGold(cost);
 
     if (!wasPurchased) {
-        window.alert("Not enough gold for " + itemName + ".");
+        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work fool");
         return false;
     }
 

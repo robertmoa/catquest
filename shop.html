@@ -29,24 +29,26 @@
 
     <section class="row g-4 align-items-start">
       <!-- Left side: featured cat panel that stays visible while scrolling -->
-      <div class="col-lg-5">
-        <div class="card shop-feature-card border-0 shadow-sm rounded-4 overflow-hidden h-100" style="position: sticky; top: 2rem;">
-          <div class="card-body p-4 p-lg-5 bg-light text-center">
+      <div class="col-lg-5 shop-sidebar-column">
+        <div class="card shop-feature-card shop-fixed-panel border-0 shadow-sm rounded-4 overflow-hidden h-100">
+          <div class="card-body shop-feature-body p-4 text-center">
             <!-- Intro text for the featured character area -->
             <p class="text-uppercase text-muted fw-semibold small mb-2">Featured Adventurer</p>
-            <h1 class="h2 fw-bold mb-3">Gear up your cat</h1>
-            <p class="shop-subtitle text-secondary mb-4">
-              Browse the latest blades and pick the perfect weapon for your next quest.
-            </p>
+            <h1 class="h3 fw-bold mb-3">Gear up your cat</h1>
 
             <!-- Larger cat sprite display -->
-            <div class="position-relative mx-auto d-flex justify-content-center align-items-center" style="min-height: 380px;">
+            <div class="shop-cat-frame position-relative mx-auto d-flex justify-content-center align-items-center">
               <img
                 src="catsprite.png"
                 alt="Avatar"
-                class="img-fluid"
-                style="max-width: 320px; width: 100%;"
+                class="img-fluid shop-cat-image"
               >
+            </div>
+
+            <!-- Current player gold display -->
+            <div class="shop-gold-panel mt-4">
+              <p class="text-uppercase text-muted fw-semibold shop-gold-label mb-1">Current Gold</p>
+              <h3 class="shop-gold-value mb-0"><span id="shop-gold-amount">0</span> gold</h3>
             </div>
           </div>
         </div>
@@ -61,18 +63,6 @@
             <p class="shop-subtitle text-secondary mb-0">Choose a weapon and head back into battle.</p>
           </div>
           <a href="main.html" class="btn btn-outline-secondary">Back</a>
-        </div>
-
-        <!-- Temporary testing area for the gold system -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-          <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-            <div>
-              <p class="text-uppercase text-muted fw-semibold small mb-1">Test Controls</p>
-              <h3 class="h5 mb-1">Player Gold: <span id="shop-gold-amount">0</span></h3>
-              <p class="text-secondary mb-0">Temporary button for testing gold gain in the shop.</p>
-            </div>
-            <button id="add-gold-button" class="btn btn-success">Add 500 Gold</button>
-          </div>
         </div>
 
         <!-- Responsive grid of shop items -->
@@ -103,8 +93,8 @@
               >
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Nuclear Flamebringer Deathknife</h5>
-                <p class="card-text text-secondary mb-4">Cost: 200 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="200" data-item-name="Nuclear Flamebringer Deathknife">Buy</button>
+                <p class="card-text text-secondary mb-4">Cost: 1000 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="1000" data-item-name="Nuclear Flamebringer Deathknife">Buy</button>
               </div>
             </div>
           </div>
@@ -134,9 +124,9 @@
                 alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Moonlit Rapier</h5>
+                <h5 class="card-title">Sword of Uncertantity</h5>
                 <p class="card-text text-secondary mb-4">Cost: 350 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="350" data-item-name="Moonlit Rapier">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="350" data-item-name="Sword of Uncertantity">Buy</button>
               </div>
             </div>
           </div>
@@ -223,6 +213,10 @@
         </div>
       </div>
     </section>
+  </div>
+
+  <div class="shop-bottom-controls text-center pb-4">
+    <button id="add-gold-button" class="btn btn-success btn-sm">Add 500 Gold</button>
   </div>
 
   <!-- Loads shared game logic, including the gold helper functions -->
