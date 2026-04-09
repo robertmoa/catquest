@@ -88,7 +88,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Short Longsword</h5>
                 <p class="card-text text-secondary mb-4">Cost: 100 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="100" data-item-name="Short Longsword">Buy</button>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Nuclear Flamebringer Deathknife</h5>
                 <p class="card-text text-secondary mb-4">Cost: 200 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="200" data-item-name="Nuclear Flamebringer Deathknife">Buy</button>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Chilly Cutlass</h5>
                 <p class="card-text text-secondary mb-4">Cost: 300 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="300" data-item-name="Chilly Cutlass">Buy</button>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Moonlit Rapier</h5>
                 <p class="card-text text-secondary mb-4">Cost: 350 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="350" data-item-name="Moonlit Rapier">Buy</button>
               </div>
             </div>
           </div>
@@ -152,7 +152,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Thunderpaw Axe</h5>
                 <p class="card-text text-secondary mb-4">Cost: 425 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="425" data-item-name="Thunderpaw Axe">Buy</button>
               </div>
             </div>
           </div>
@@ -168,7 +168,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Shadowfang Dagger</h5>
                 <p class="card-text text-secondary mb-4">Cost: 275 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="275" data-item-name="Shadowfang Dagger">Buy</button>
               </div>
             </div>
           </div>
@@ -184,7 +184,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Sunforge Hammer</h5>
                 <p class="card-text text-secondary mb-4">Cost: 500 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="500" data-item-name="Sunforge Hammer">Buy</button>
               </div>
             </div>
           </div>
@@ -200,7 +200,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Stormcaller Spear</h5>
                 <p class="card-text text-secondary mb-4">Cost: 390 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="390" data-item-name="Stormcaller Spear">Buy</button>
               </div>
             </div>
           </div>
@@ -216,7 +216,7 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Whisperwind Bow</h5>
                 <p class="card-text text-secondary mb-4">Cost: 460 gold</p>
-                <button class="btn btn-primary mt-auto">Buy</button>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="460" data-item-name="Whisperwind Bow">Buy</button>
               </div>
             </div>
           </div>
@@ -226,35 +226,6 @@
   </div>
 
   <!-- Loads shared game logic, including the gold helper functions -->
-  <script src="main.js"></script>
-
-  <!-- Shop-only test script for displaying and adding player gold -->
-  <script>
-    const goldAmount = document.getElementById("shop-gold-amount");
-    const addGoldButton = document.getElementById("add-gold-button");
-
-    // Updates the gold text on the page using the shared gold functions
-    function renderShopGold() {
-      if (typeof getPlayerGold === "function") {
-        goldAmount.textContent = getPlayerGold();
-      }
-    }
-
-    // Temporary testing button that gives the player 500 gold
-    addGoldButton.addEventListener("click", () => {
-      if (typeof addPlayerGold === "function") {
-        addPlayerGold(500);
-        renderShopGold();
-      }
-    });
-
-    // Keeps the shop display in sync if gold changes elsewhere on the page
-    window.addEventListener("playerGoldUpdated", (event) => {
-      goldAmount.textContent = event.detail.gold;
-    });
-
-    // Shows the current gold amount when the page first loads
-    renderShopGold();
-  </script>
+  <script src="shop.js"></script>
 </body>
 </html>

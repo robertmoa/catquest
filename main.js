@@ -98,34 +98,3 @@ function updategamestate(){
 
 
 
-
-// simple persistent gold tracker shared across pages
-const PLAYER_GOLD_STORAGE_KEY = "catquest_player_gold";
-
-function getPlayerGold() {
-    const storedGold = Number(localStorage.getItem(PLAYER_GOLD_STORAGE_KEY));
-
-    if (Number.isNaN(storedGold)) {
-        localStorage.setItem(PLAYER_GOLD_STORAGE_KEY, "0");
-        return 0;
-    }
-
-    return storedGold;
-}
-
-function setPlayerGold(amount) {
-    const safeAmount = Math.max(0, Number(amount) || 0);
-    localStorage.setItem(PLAYER_GOLD_STORAGE_KEY, String(safeAmount));
-    window.dispatchEvent(new CustomEvent("playerGoldUpdated", {
-        detail: { gold: safeAmount }
-    }));
-    return safeAmount;
-}
-
-function addPlayerGold(amount) {
-    return setPlayerGold(getPlayerGold() + (Number(amount) || 0));
-}
-
-window.getPlayerGold = getPlayerGold;
-window.setPlayerGold = setPlayerGold;
-window.addPlayerGold = addPlayerGold;
