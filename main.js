@@ -58,13 +58,13 @@ function startgame()
 {
     screen.start();
     screen.ctx.imageSmoothingEnabled = false;
+    screen.ctx.font = '16px Minecraft'
     mycat = new cat(screen.canvas.width/2,screen.canvas.height/2,p_sprite,"mycat");
 }
 function drawplayer(thiscat)
 {
     screen.ctx.textAlign = "center";
     screen.ctx.drawImage(thiscat.img,thiscat.x,thiscat.y,64,64);
-    screen.ctx.font = "20px sans-serif";
     screen.ctx.fillText(thiscat.username,thiscat.x+32,thiscat.y-8);
 }
 

@@ -3,3 +3,17 @@
   max-height: 80vh;   /* 60% of screen height */
   overflow-y: auto;
 }
+@font-face {
+  font-family: 'Minecraft';
+  src: url('fonts/Minecraft.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+
+}
+img {
+  image-rendering: pixelated; /* Modern browsers */
+  image-rendering: crisp-edges; /* Firefox & Safari */
+}
+:root {
+  --bs-body-font-family: "Minecraft", sans-serif;
+}
