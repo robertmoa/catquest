@@ -1,0 +1,26 @@
+Requirement for the rpg, Gameplay Requirements:
+- Player has the ability to click on button called "Enter Dungeon" to enter Dungeon.
+- Clicking "Enter Dungeon" initiates a battle against a random enemy.
+- Battle is turn-based.
+- Player alwaus takes the first turn.
+- Current Available actions are:
+1. Attack
+2. Flee
+- When the player clicks/enters attack, the enemy loses said HP based on current player attack attribute.
+- If enemy survives, enemy attacks & player loses HP based on the enemy attack stat.
+- If enemy dies, player gains random gold & EXP, and another enemy can spawn.
+- If player runs, the dungeon session ends & returns back to main room.
+- If player is defeated, the dungeon session ends, the player loses 30% currently held gold.
+
+Leveling system:
+- tbc.
+
+Enemy generation:
+- tbc.
+UI requirements:
+- Show player sprite & enemt sprite on screen.
+- Show health bar for both.
+- Show current stats.
+- Show a battle log.
+- Keep UI simplistic.
+- Use DOM manipulation only, no React.
