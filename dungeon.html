@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatQuest - Dungeon</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="dungeon.css">
+</head>
+<body>
+    <div class="container-fluid px-3">
+        <div class="row">
+            <div class="col">
+                <div class="p-3">
+                    <nav class="navbar navbar-expand navbar-light bg-grey border border-4 border-light-subtle rounded-3">
+                        <div class="container-fluid">
+                            <a class="navbar-brand px-3 h1 mb-0" href="main.html">
+                                <span class="text-light-emphasis">Cat</span>Quest
+                            <ul class="navbar-nav ms-auto px-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="shop.html">Shop</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="battle-page">
+            <main id="battle-area" class="border border-4 border-light-subtle rounded-3" aria-label="Dungeon battle area">
+                <section id="player-unit" class="battle-unit" aria-label="Player">
+                    <div id="player-hud" class="unit-panel">
+                        <div class="hp-row">
+                            <span class="hp-label">HP</span>
+                            <span id="player-hp-text" class="hp-text">30 / 30</span>
+                        </div>
+                        <div class="hp-bar-bg" aria-hidden="true">
+                            <div id="player-hp-fill" class="hp-bar-fill"></div>
+                        </div>
+                    </div>
+
+                    <img id="player-sprite" src="catsprite.png" alt="Player cat sprite">
+
+                    <div id="player-actions" class="unit-actions">
+                        <button id="btn-damage" class="btn btn-outline-danger btn-sm" type="button">Take 5</button>
+                        <button id="btn-heal" class="btn btn-outline-success btn-sm" type="button">Heal 5</button>
+                    </div>
+                </section>
+
+                <section id="enemy-unit" class="battle-unit" aria-label="Enemy">
+                    <img id="enemy-sprite" src="ecatsprite.png" alt="Enemy cat sprite">
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="dungeon.js"></script>
+</body>
+</html>
