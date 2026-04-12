@@ -1,10 +1,22 @@
 const player = {
+  name: "Player",
   currentHp: 30,
-  maxHp: 30
+  maxHp: 30,
+  attack: 5
 };
 
-const hpFill = document.getElementById("player-hp-fill");
-const hpText = document.getElementById("player-hp-text");
+const enemy = {
+  name: "Angry Cat",
+  currentHp: 20,
+  maxHp: 20,
+  attack: 3
+};
+
+const playerHpFill = document.getElementById("player-hp-fill");
+const playerHpText = document.getElementById("player-hp-text");
+const enemyHpFill = document.getElementById("enemy-hp-fill");
+const enemyHpText = document.getElementById("enemy-hp-text");
+
 const damageButton = document.getElementById("btn-damage");
 const healButton = document.getElementById("btn-heal");
 
@@ -20,30 +32,56 @@ function getHpColor(hpPercent) {
   return "crimson";
 }
 
-function updatePlayerHpUI() {
-  const hpPercent = (player.currentHp / player.maxHp) * 100;
+function updateHpUI(unit, hpFillElement, hpTextElement) {
+  const hpPercent = (unit.currentHp / unit.maxHp) * 100;
 
-  hpFill.style.width = `${hpPercent}%`;
-  hpFill.style.backgroundColor = getHpColor(hpPercent);
-  hpText.textContent = `${player.currentHp} / ${player.maxHp}`;
+  hpFillElement.style.width = `${hpPercent}%`;
+  hpFillElement.style.backgroundColor = getHpColor(hpPercent);
+  hpTextElement.textContent = `${unit.currentHp} / ${unit.maxHp}`;
 }
 
-function takeDamage(amount) {
-  player.currentHp = Math.max(0, player.currentHp - amount);
-  updatePlayerHpUI();
+function applyDamage(unit, amount) {
+  unit.currentHp = Math.max(0, unit.currentHp - amount);
 }
 
-function heal(amount) {
-  player.currentHp = Math.min(player.maxHp, player.currentHp + amount);
-  updatePlayerHpUI();
+function healUnit(unit, amount) {
+  unit.currentHp = Math.min(unit.maxHp, unit.currentHp + amount);
+}
+
+function playerAttackEnemy() {
+  applyDamage(enemy, player.attack);
+  updateHpUI(enemy, enemyHpFill, enemyHpText);
+}
+
+function enemyAttackPlayer() {
+  applyDamage(player, enemy.attack);
+  updateHpUI(player, playerHpFill, playerHpText);
 }
 
 damageButton.addEventListener("click", () => {
-  takeDamage(5);
+  if (enemy.currentHp <= 0 || player.currentHp <= 0) {
+    return;
+  }
+
+  playerAttackEnemy();
+
+  if (enemy.currentHp > 0) {
+    enemyAttackPlayer();
+  }
 });
 
 healButton.addEventListener("click", () => {
-  heal(5);
+  if (player.currentHp <= 0) {
+    return;
+  }
+
+  healUnit(player, 5);
+  updateHpUI(player, playerHpFill, playerHpText);
+
+  if (enemy.currentHp > 0) {
+    enemyAttackPlayer();
+  }
 });
 
-updatePlayerHpUI();
+updateHpUI(player, playerHpFill, playerHpText);
+updateHpUI(enemy, enemyHpFill, enemyHpText);

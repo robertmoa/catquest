@@ -12,8 +12,8 @@
 
 #player-hud {
   position: absolute;
-  bottom: 100%;
-  left: 20px;
+  top: 10px;
+  left: 120px;
   width: 180px;
   margin-bottom: 10px;
 }
@@ -68,4 +68,19 @@
   margin-top: 10px;
   display: flex;
   gap: 8px;
+}
+
+/* Temporary dummy for enemy hp logic */
+#enemy-unit {
+  position: absolute;
+  top: 150px;
+  right: 100px;
+}
+
+#enemy-hud {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  width: 180px;
+  margin-bottom: 10px;
 }
