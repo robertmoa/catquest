@@ -14,7 +14,10 @@ document.addEventListener('keyup', (event) => {
     });
 
 // gets the player sprite so it can be drawn
-const p_sprite = document.getElementById("playersprite")
+const p_sprite_n = document.getElementById("playersprite_n")
+const p_sprite_e = document.getElementById("playersprite_e")
+const p_sprite_s = document.getElementById("playersprite_s")
+const p_sprite_w = document.getElementById("playersprite_w")
 // sets up the velocity variable
 vel = 3;
 
@@ -29,11 +32,12 @@ class vector{
 
 //cat class! contains its position, image it should use, and its username
 class cat{
-    constructor(x,y,img,username){
+    constructor(x,y,imgs,username,dir){
         this.x = x
         this.y = y
-        this.img = img
+        this.imgs = imgs
         this.username = username
+        this.dir = dir
     }
     velocity = new vector(0,0);
 }
@@ -59,12 +63,12 @@ function startgame()
     screen.start();
     screen.ctx.imageSmoothingEnabled = false;
     screen.ctx.font = '16px Minecraft'
-    mycat = new cat(screen.canvas.width/2,screen.canvas.height/2,p_sprite,"mycat");
+    mycat = new cat(screen.canvas.width/2,screen.canvas.height/2,[p_sprite_n,p_sprite_e,p_sprite_s,p_sprite_w],"mycat",0);
 }
 function drawplayer(thiscat)
 {
     screen.ctx.textAlign = "center";
-    screen.ctx.drawImage(thiscat.img,thiscat.x,thiscat.y,64,64);
+    screen.ctx.drawImage(thiscat.imgs[thiscat.dir],thiscat.x,thiscat.y,64,64);
     screen.ctx.fillText(thiscat.username,thiscat.x+32,thiscat.y-8);
 }
 
@@ -72,20 +76,25 @@ function updatescreen(){
     screen.clear();
     drawplayer(mycat);
 }
+
 function updategamestate(){
     if (document.activeElement != chatInput)
     {
         if (pressedKeys.has('KeyW')){
-        mycat.y -=vel
+        mycat.y -=vel;
+        mycat.dir = 0;
         }
         if (pressedKeys.has('KeyS')){
-            mycat.y += vel
+            mycat.y += vel;
+            mycat.dir = 2;
         }
         if (pressedKeys.has('KeyA')){
-            mycat.x -=vel
+            mycat.x -=vel;
+            mycat.dir = 3;
         }
         if (pressedKeys.has('KeyD')){
-            mycat.x +=vel
+            mycat.x +=vel;
+            mycat.dir = 1;
         }
     }
 }
