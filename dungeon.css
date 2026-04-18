@@ -1,7 +1,11 @@
 #battle-area {
   position: relative;
   height: calc(100vh - 100px);
-  background-color: #d9d9d9;
+
+  background-image: url('rpgbg.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 #player-unit {
