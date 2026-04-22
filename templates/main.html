@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatQuest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<!--Loads all images used for the game, hiddenly-->
+<div style="display:none;">
+<img id="playersprite_n" src="{{ url_for('static', filename='images/catsprite-n.png') }}" alt="Description">
+<img id="playersprite_e" src="{{ url_for('static', filename='images/catsprite-e.png') }}" alt="Description">
+<img id="playersprite_s" src="{{ url_for('static', filename='images/catsprite-s.png') }}" alt="Description">
+<img id="playersprite_w" src="{{ url_for('static', filename='images/catsprite-w.png') }}" alt="Description">
+
+</div>
+
+
+
+
+<!--main body-->
+<body onload = "startgame()">
+
+
+
+<!--Main elements, the game window and the chatbox-->
+<div class="container-fluid px-3">
+  <!--navigation bar-->
+  <div class="row">
+    <div class="col">
+      <div class="p-3">
+        <nav class="navbar navbar-expand navbar-light bg-grey border border-4 border-light-subtle rounded-3">
+          <div class="container-fluid">
+    
+            <!-- Brand -->
+            <a class="navbar-brand px-3 h1 mb-0" href="{{ url_for('home') }}">
+              <span class="text-light-emphasis">Cat</span>Quest
+            </a>
+
+            <!-- Link -->
+            <ul class="navbar-nav ms-auto px-3">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('dungeon') }}">Dungeon</a>
+                <a class="nav-link" href="{{ url_for('shop') }}">Shop</a>
+                </li>
+            </ul>
+
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+  <!-- Game -->
+  <div class="row">
+    
+    <div class="col-7">
+      <div class="ratio ratio-4x3">
+        <canvas class="border border-4 border-light-subtle rounded-3" id="gamecanvas" width="720" height="480"></canvas>
+      </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="col d-flex flex-column 60vh">
+      <!--Chatbox-->
+      <div id="chat_box" class="flex-grow-1 overflow-auto border border-4 border-light-subtle rounded-3 fs-4 bg-light bg-gradient"> </div>
+      
+      <div class="d-flex p-2 gap-2">
+        <!--Send input box-->
+        <input id="input_send" class="form-control" type="text" placeholder="Type a message..." />
+        <!--Send button-->
+        <button id="btn_send" class="btn btn-outline-secondary" type="submit" >Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
