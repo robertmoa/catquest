@@ -34,15 +34,15 @@
           <div class="container-fluid">
     
             <!-- Brand -->
-            <a class="navbar-brand px-3 h1 mb-0" href="{{ url_for('home') }}">
+            <a class="navbar-brand px-3 h1 mb-0" href="{{ url_for('main.home') }}">
               <span class="text-light-emphasis">Cat</span>Quest
             </a>
 
             <!-- Link -->
             <ul class="navbar-nav ms-auto px-3">
               <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('dungeon') }}">Dungeon</a>
-                <a class="nav-link" href="{{ url_for('shop') }}">Shop</a>
+                <a class="nav-link" href="{{ url_for('main.dungeon') }}">Dungeon</a>
+                <a class="nav-link" href="{{ url_for('main.shop') }}">Shop</a>
                 </li>
             </ul>
 
@@ -74,7 +74,10 @@
     </div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/connect.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
 </body>
 </html>

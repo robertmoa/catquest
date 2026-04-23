@@ -14,15 +14,15 @@
     <nav class="navbar navbar-expand-sm shop-navbar bg-white border border-2 rounded-4 shadow-sm px-3 px-lg-4 mb-4">
       <div class="container-fluid px-0">
         <!-- Game title / brand link -->
-        <a class="navbar-brand fw-bold fs-3" href="{{ url_for('home') }}">
+        <a class="navbar-brand fw-bold fs-3" href="{{ url_for('main.home') }}">
           <span class="text-secondary">Cat</span>Quest
         </a>
 
         <!-- Current page link -->
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link active fw-semibold" href="{{ url_for('dungeon') }}">Dungeon</a>
-            <a class="nav-link active fw-semibold" href="{{ url_for('shop') }}  " aria-current="page">Shop</a>
+            <a class="nav-link active fw-semibold" href="{{ url_for('main.dungeon') }}">Dungeon</a>
+            <a class="nav-link active fw-semibold" href="{{ url_for('main.shop') }}  " aria-current="page">Shop</a>
           </li>
         </ul>
       </div>
@@ -63,7 +63,7 @@
             <h2 class="h3 mb-1">Weapon Shop</h2>
             <p class="shop-subtitle text-secondary mb-0">Choose a weapon and head back into battle.</p>
           </div>
-          <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Back</a>
+          <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary">Back</a>
         </div>
 
         <!-- Responsive grid of shop items -->
