@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatQuest - Dungeon</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dungeon.css') }}">
+</head>
+<body>
+    <div class="container-fluid px-3">
+        <div class="row">
+            <div class="col">
+                <div class="p-3">
+                    <nav class="navbar navbar-expand navbar-light bg-grey border border-4 border-light-subtle rounded-3">
+                        <div class="container-fluid">
+                            <a class="navbar-brand px-3 h1 mb-0" href="{{ url_for('home') }}">
+                                <span class="text-light-emphasis">Cat</span>Quest - Dungeon </a>
+                            <ul class="navbar-nav ms-auto px-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('shop') }}">Shop</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="battle-page">
+            <main id="battle-area" class="border border-4 border-light-subtle rounded-3" aria-label="Dungeon battle area">
+                <section id="battle-log" aria-label="Battle log">
+                    <div class="battle-log-messages" id="log-messages"></div>
+                </section>
+                <section id="player-unit" class="battle-unit" aria-label="Player">
+                    <div id="player-hud-wrapper">
+                    <div id="player-hud" class="unit-panel">
+                        <div class="stats-row">
+                            <span class="stat-label">HP</span>
+                            <span id="player-hp-text" class="stat-value">30 / 30</span>
+                        </div>
+                        <div class="hp-bar-bg" aria-hidden="true">
+                            <div id="player-hp-fill" class="hp-bar-fill"></div>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Gold</span>
+                            <span id="player-gold" class="stat-value">0</span>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Level</span>
+                            <span id="player-level" class="stat-value">1</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stat-label">XP</span>
+                            <span id="player-xp" class="stat-value">0 / 50</span>
+                        </div>
+                        <div class="xp-bar-bg" aria-hidden="true">
+                            <div id="player-xp-fill" class="xp-bar-fill"></div>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Attack</span>
+                            <span id="player-attack" class="stat-value">5</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stat-label">Enemies Defeated</span>
+                            <span id="enemy-count" class="stat-value">0</span>
+                        </div>
+                    </div>
+
+                    <img id="player-sprite" src="{{ url_for('static', filename='images/catsprite-s.png') }}" alt="Player cat sprite">
+
+                    <div id="player-actions" class="unit-actions">
+                        <button id="btn-damage" class="btn btn-outline-danger btn-sm" type="button">Scratch</button>
+                        <button id="btn-heal" class="btn btn-outline-success btn-sm" type="button">Heal</button>
+                        <button id="btn-run" class="btn btn-outline-secondary btn-sm" type="button">Flee</button>
+                    </div>
+                </section>
+
+                <section id="enemy-unit" class="battle-unit" aria-label="Enemy">
+                    <div id="enemy-hud" class="unit-panel">
+                        <div class="hp-row">
+                            <span class="hp-label" id="enemy-name">Angry Cat #1</span>
+                            <span id="enemy-hp-text" class="hp-text">20 / 20</span>
+                        </div>
+                        <div class="hp-bar-bg" aria-hidden="true">
+                            <div id="enemy-hp-fill" class="hp-bar-fill"></div>
+                        </div>
+                    </div>
+                    <img id="enemy-sprite" src="{{ url_for('static', filename='images/ecatsprite.png') }}" alt="Enemy cat sprite">
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/shop.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>
+</body>
+</html>
