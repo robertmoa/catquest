@@ -49,6 +49,14 @@ function renderShopGold() {
 }
 
 function buyShopItem(cost, itemName) {
+    const customPromptsByItem = {
+        "An Above Average Sized Dagger": [
+            "I assure you, I am actually above average size AND I am really funny\n\nBuy An Above Average Sized Dagger for " + cost + " gold?"
+        ],
+        "Wooden Sword": [
+            "Trust me, it's really strong wood\n\nBuy Wooden Sword for " + cost + " gold?"
+        ]
+    };
     const confirmationPrompts = itemName === "Sword of Uncertainty"
         ? [
             "Are you sure you want to purchase this sword",
@@ -57,7 +65,7 @@ function buyShopItem(cost, itemName) {
             "This is your fourth confirmation. You must really want this, right?",
             "Last chance! Theres no going back now"
         ]
-        : ["Are you sure you want to buy " + itemName + " for " + cost + " gold?"];
+        : (customPromptsByItem[itemName] || ["Are you sure you want to buy " + itemName + " for " + cost + " gold?"]);
 
     for (const promptMessage of confirmationPrompts) {
         const confirmedPurchase = window.confirm(promptMessage);
