@@ -49,7 +49,7 @@ function renderShopGold() {
 }
 
 function buyShopItem(cost, itemName) {
-    const confirmationPrompts = itemName === "Sword of Uncertantity"
+    const confirmationPrompts = itemName === "Sword of Uncertainty"
         ? [
             "Are you sure you want to purchase this sword",
             "Youre 100% certain?",
