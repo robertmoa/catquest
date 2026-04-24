@@ -209,6 +209,25 @@ function initializeShopButtons() {
     });
 }
 
+// Attaches click handlers to each inspect button so the placeholder weapon info can
+// expand and collapse without leaving the shop page.
+function initializeInspectWeaponButtons() {
+    const inspectButtons = document.querySelectorAll(".inspect-weapon-button");
+
+    inspectButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const detailsElement = button.nextElementSibling;
+
+            if (!detailsElement || !detailsElement.classList.contains("inspect-weapon-details")) {
+                return;
+            }
+
+            const isNowHidden = detailsElement.classList.toggle("d-none");
+            button.setAttribute("aria-expanded", String(!isNowHidden));
+        });
+    });
+}
+
 // Attaches the click handler for the mystery box button.
 function initializeMysteryBoxButton() {
     const mysteryBoxButton = document.getElementById("buy-mystery-box-button");
@@ -252,6 +271,7 @@ function initializeShopAddGoldButton() {
 function initializeShopPage() {
     initializeShopGoldDisplay();
     initializeShopButtons();
+    initializeInspectWeaponButtons();
     initializeMysteryBoxButton();
     initializeShopAddGoldButton();
 }
