@@ -66,6 +66,20 @@
           <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">Back</a>
         </div>
 
+        <!-- Special shop feature for a gamble-style purchase with random rewards. -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+              <div>
+                <p class="text-uppercase text-muted fw-semibold small mb-1">Special Offer</p>
+                <h3 class="h5 mb-1">Mystery Box</h3>
+                <p class="text-secondary mb-0">For only 100 gold, have the chance to win 5000 gold!</p>
+              </div>
+              <button id="buy-mystery-box-button" class="btn btn-warning fw-semibold">Open for 100 Gold</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Responsive grid of shop items -->
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
           <!-- Weapon card -->
@@ -78,8 +92,13 @@
               >
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Short Longsword</h5>
-                <p class="card-text text-secondary mb-4">Cost: 100 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="100" data-item-name="Short Longsword">Buy</button>
+                <p class="card-text text-secondary mb-4">Cost: 5 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="5" data-item-name="Short Longsword">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -88,14 +107,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Nuclear Flamebringer Deathknife.png') }}"
+                src="{{ url_for('static', filename='images/Swords/An Above Average Sized Dagger.png') }}"
                 class="card-img-top shop-item-image"
-                alt="Sword"
+                alt="Dagger"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Nuclear Flamebringer Deathknife</h5>
-                <p class="card-text text-secondary mb-4">Cost: 1000 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="1000" data-item-name="Nuclear Flamebringer Deathknife">Buy</button>
+                <h5 class="card-title">An Above Average Sized Dagger</h5>
+                <p class="card-text text-secondary mb-4">Cost: 15 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="15" data-item-name="An Above Average Sized Dagger">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -110,8 +134,13 @@
               >
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">Chilly Cutlass</h5>
-                <p class="card-text text-secondary mb-4">Cost: 300 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="300" data-item-name="Chilly Cutlass">Buy</button>
+                <p class="card-text text-secondary mb-4">Cost: 25 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="25" data-item-name="Chilly Cutlass">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -120,14 +149,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Sword of Uncertantity.png') }}"
+                src="{{ url_for('static', filename='images/Swords/Rapier of Death and Despair.png') }}"
                 class="card-img-top shop-item-image"
                 alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Sword of Uncertantity</h5>
-                <p class="card-text text-secondary mb-4">Cost: 350 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="350" data-item-name="Sword of Uncertantity">Buy</button>
+                <h5 class="card-title">Rapier of Death and Despair</h5>
+                <p class="card-text text-secondary mb-4">Cost: 35 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="35" data-item-name="Rapier of Death and Despair">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -136,14 +170,19 @@
           <div class="col">
               <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
                 <img
-                  src="{{ url_for('static', filename='images/Swords/Star.png') }}"
+                  src="{{ url_for('static', filename='images/Swords/Sexy Saber.png') }}"
                   class="card-img-top shop-item-image"
-                  alt="Axe"
+                  alt="Sword"
                 >
                 <div class="card-body d-flex flex-column">
-                  <h5 class="card-title">star</h5>
-                  <p class="card-text text-secondary mb-4">Cost: 425 gold</p>
-                  <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="425" data-item-name="Thunderpaw Axe">Buy</button>
+                  <h5 class="card-title">Sexy Saber</h5>
+                  <p class="card-text text-secondary mb-4">Cost: 50 gold</p>
+                  <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="50" data-item-name="Sexy Saber">Buy</button>
+                  <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                  <div class="inspect-weapon-details d-none mt-3">
+                    <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                    <p class="small fw-semibold mb-0">Damage: X</p>
+                  </div>
                 </div>
               </div>
           </div>
@@ -152,14 +191,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Shadowfang Dagger.png') }}"
+                src="{{ url_for('static', filename='images/Swords/ScHIMitar.png') }}"
                 class="card-img-top shop-item-image"
-                alt="Dagger"
+                alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Shadowfang Dagger</h5>
-                <p class="card-text text-secondary mb-4">Cost: 275 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="275" data-item-name="Shadowfang Dagger">Buy</button>
+                <h5 class="card-title">ScHIMitar</h5>
+                <p class="card-text text-secondary mb-4">Cost: 65 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="65" data-item-name="ScHIMitar">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -168,14 +212,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Sunforge Hammer.png') }}"
+                src="{{ url_for('static', filename='images/Swords/Nuclear Flamebringer Deathknife.png') }}"
                 class="card-img-top shop-item-image"
-                alt="Hammer"
+                alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Sunforge Hammer</h5>
-                <p class="card-text text-secondary mb-4">Cost: 500 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="500" data-item-name="Sunforge Hammer">Buy</button>
+                <h5 class="card-title">Nuclear Flamebringer Deathknife</h5>
+                <p class="card-text text-secondary mb-4">Cost: 80 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="80" data-item-name="Nuclear Flamebringer Deathknife">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -184,14 +233,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Stormcaller Spear.png') }}"
+                src="{{ url_for('static', filename='images/Swords/Wooden Sword.png') }}"
                 class="card-img-top shop-item-image"
-                alt="Spear"
+                alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Stormcaller Spear</h5>
-                <p class="card-text text-secondary mb-4">Cost: 390 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="390" data-item-name="Stormcaller Spear">Buy</button>
+                <h5 class="card-title">Wooden Sword</h5>
+                <p class="card-text text-secondary mb-4">Cost: 100 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="100" data-item-name="Wooden Sword">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
@@ -200,14 +254,19 @@
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
               <img
-                src="{{ url_for('static', filename='images/Swords/Whisperwind Bow.png') }}"
+                src="{{ url_for('static', filename='images/Swords/Sword of Uncertainty.png') }}"
                 class="card-img-top shop-item-image"
-                alt="Bow"
+                alt="Sword"
               >
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Whisperwind Bow</h5>
-                <p class="card-text text-secondary mb-4">Cost: 460 gold</p>
-                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="460" data-item-name="Whisperwind Bow">Buy</button>
+                <h5 class="card-title">Sword of Uncertainty</h5>
+                <p class="card-text text-secondary mb-4">Cost: 1339 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="1339" data-item-name="Sword of Uncertainty">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Weapon</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
+                  <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
               </div>
             </div>
           </div>
