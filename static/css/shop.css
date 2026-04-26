@@ -50,13 +50,13 @@ body {
 /* Sidebar */
 .shop-fixed-panel {
   position: fixed;
-  top: 8.5rem;
+  top: 10rem;
   width: min(100%, 360px);
 }
 
 /* Cat display */
 .shop-cat-frame {
-  width: 320px;
+  width: 300px;
   min-height: 320px;
   padding: 1rem;
   border-radius: 1rem;
