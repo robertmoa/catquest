@@ -5,14 +5,14 @@ from flask_socketio import emit
 from flask import request
 
 @socketio.on("new_user")
-def create_user(user):
-    user = User.query.filter_by(username=username).first()
+def create_user(new_user):
+    user = User.query.filter_by(username=new_user['username']).first()
     #this tells us that no user by that name is in User table, thus create it
     if user == None:
-        pw_hashed = generate_password_hash(user['password'])
-        username = user['username']
-        new_user = User(username=username,password=pw_hashed)
-        db.session.add(new_user)
+        pw_hashed = generate_password_hash(new_user['password'])
+        username = new_user['username']
+        new_user_entry = User(username=username,password=pw_hashed)
+        db.session.add(new_user_entry)
         db.session.commit()
         emit('new_user_added')
         #tells client this user already exists.
