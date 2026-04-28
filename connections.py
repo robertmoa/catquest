@@ -4,19 +4,8 @@ from serverstuff import socketio, users
 #gets the users dictionary from serverstuff
 
 
-@socketio.on('connectmsg')
-def handle_connectmsg(connectmsg):
-    print(connectmsg['data'] + ' has connected, adding them to users and putting them in their room...')
 
-    users[request.sid] = connectmsg['data']
-    print(users)
-    join_room(connectmsg['data'])
 
-    data = {
-        'userid': 'CatQuest',
-        'txt': f"{connectmsg['data']} has joined"
-    }
-    emit('chatmsg', data, broadcast=True)
     
 
 @socketio.on('disconnect')
