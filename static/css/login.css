@@ -9,36 +9,135 @@
 
 :root {
   --bs-body-font-family: "Minecraft", sans-serif;
+  --page-bg: #172018;
+  --panel-bg: #fff8e8;
+  --panel-border: #31251b;
+  --primary: #2f7f5f;
+  --primary-dark: #225c46;
+  --accent: #d79b42;
+  --text: #2b2119;
+  --muted: #765f4b;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
+  padding: 24px;
+  color: var(--text);
+  background:
+    linear-gradient(rgba(23, 32, 24, 0.62), rgba(23, 32, 24, 0.82)),
+    url("/static/images/rbg.jpg");
+  background-position: center;
+  background-size: cover;
 }
 
 .login-box {
-  width: 300px;
-  padding: 20px;
-  border: 1px solid #ccc;
+  width: min(100%, 380px);
+  padding: 28px;
+  border: 3px solid var(--panel-border);
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background: var(--panel-bg);
+  box-shadow: 0 16px 0 rgba(0, 0, 0, 0.32);
 }
 
-.login-box h2 {
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  color: var(--muted);
+}
+
+.brand-mark {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 3px solid var(--panel-border);
+  border-radius: 8px;
+  color: #fff;
+  background: var(--accent);
+  box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.18);
+}
+
+.brand p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.login-box h1 {
   text-align: center;
-  margin-bottom: 20px;
+  margin: 0 0 24px;
+  font-size: 2rem;
+}
+
+.login-box label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
 }
 
 .login-box input {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
+  min-height: 48px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 2px solid #b79368;
+  border-radius: 6px;
+  color: var(--text);
+  background: #fffdf7;
+  outline: none;
+}
+
+.login-box input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(47, 127, 95, 0.18);
 }
 
 .login-box button {
   width: 100%;
-  padding: 10px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.primary-button {
+  margin-top: 4px;
+  color: #fff;
+  background: var(--primary);
+  box-shadow: inset 0 -4px 0 var(--primary-dark);
+}
+
+.primary-button:hover {
+  background: #378d6b;
+}
+
+.switch-button {
+  margin-top: 14px;
+  color: var(--primary-dark);
+  background: transparent;
+}
+
+.switch-button:hover {
+  color: var(--text);
+  background: rgba(47, 127, 95, 0.1);
+}
+
+@media (max-width: 420px) {
+  .login-box {
+    padding: 22px;
+  }
+
+  .login-box h1 {
+    font-size: 1.65rem;
+  }
 }

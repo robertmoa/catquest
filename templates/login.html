@@ -7,13 +7,40 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <div class="login-box">
-        <h2>Login</h2>
+    <div class="login-box" data-mode="login">
+        <div class="brand">
+            <span class="brand-mark">CQ</span>
+            <p>CatQuest</p>
+        </div>
+        <h1 id="form-title">Login</h1>
         <form method="POST" action="{{ url_for('main.login') }}">
-            <input type="text" name="username" placeholder="Username">
-            <input type="password" name="password" placeholder="Password">
-            <button type="submit">Log In</button>
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" placeholder="Enter your username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" placeholder="Enter your password" required>
+
+            <button id="submit-button" class="primary-button" type="submit">Log In</button>
         </form>
+        <button id="toggle-button" class="switch-button" type="button">Not a user? Sign up now!</button>
     </div>
+
+    <script>
+        const loginBox = document.querySelector(".login-box");
+        const formTitle = document.querySelector("#form-title");
+        const submitButton = document.querySelector("#submit-button");
+        const toggleButton = document.querySelector("#toggle-button");
+
+        toggleButton.addEventListener("click", () => {
+            const isLogin = loginBox.dataset.mode === "login";
+
+            loginBox.dataset.mode = isLogin ? "signup" : "login";
+            formTitle.textContent = isLogin ? "Sign Up" : "Login";
+            submitButton.textContent = isLogin ? "Sign Up" : "Log In";
+            toggleButton.textContent = isLogin
+                ? "Already a user? Log in now!"
+                : "Not a user? Sign up now!";
+        });
+    </script>
 </body>
 </html>
