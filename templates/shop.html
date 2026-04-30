@@ -8,25 +8,24 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/shop.css') }}">
 </head>
 <body>
-  <!-- Main shop page wrapper -->
-  <div class="container shop-page py-4 py-lg-5">
-    <!-- Top navigation bar -->
-    <nav class="navbar navbar-expand-sm shop-navbar bg-white border border-2 rounded-4 shadow-sm px-3 px-lg-4 mb-4">
-      <div class="container-fluid px-0">
-        <!-- Game title / brand link -->
-        <a class="navbar-brand fw-bold fs-3" href="{{ url_for('main.home') }}">
-          <span class="text-secondary">Cat</span>Quest
-        </a>
-
-        <!-- Current page link -->
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active fw-semibold" href="{{ url_for('main.dungeon') }}">Dungeon</a>
-            <a class="nav-link active fw-semibold" href="{{ url_for('main.shop') }}  " aria-current="page">Shop</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+    <div class="container-fluid px-3">
+        <div class="row">
+            <div class="col">
+                <div class="p-3">
+                    <nav class="navbar navbar-expand navbar-light bg-grey border border-4 border-light-subtle rounded-3">
+                        <div class="container-fluid">
+                            <a class="navbar-brand px-3 h1 mb-0" href="{{ url_for('main.home') }}">
+                                <span class="text-light-emphasis">Cat</span>Quest - Dungeon </a>
+                            <ul class="navbar-nav ms-auto px-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('main.dungeon') }}">Dungeon</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
 
     <section class="row g-4 align-items-start">
       <!-- Left side: featured cat panel that stays visible while scrolling -->
