@@ -60,10 +60,15 @@
         <!-- Shop heading and back button -->
         <div class="shop-header d-flex justify-content-between align-items-center mb-3">
           <div>
-            <h2 class="h3 mb-1">Weapon Shop</h2>
-            <p class="shop-subtitle text-secondary mb-0">Choose a weapon and head back into battle.</p>
+            <h2 id="shop-title" class="h3 mb-1">Sword Shop</h2>
+            <p id="shop-subtitle" class="shop-subtitle text-secondary mb-0">Choose a sword and head back into battle.</p>
           </div>
           <a href="{{ url_for('main.home') }}" class="btn btn-outline-secondary">Back</a>
+        </div>
+
+        <div class="shop-tabs btn-group mb-4" role="group" aria-label="Shop category">
+          <button id="sword-shop-button" class="btn btn-primary shop-tab-button active" type="button" data-shop-target="swords">Sword Shop</button>
+          <button id="hat-shop-button" class="btn btn-outline-primary shop-tab-button" type="button" data-shop-target="hats">Hat Shop</button>
         </div>
 
         <!-- Special shop feature for a gamble-style purchase with random rewards. -->
@@ -81,7 +86,7 @@
         </div>
 
         <!-- Responsive grid of shop items -->
-        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        <div id="sword-shop-grid" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 shop-items-grid">
           <!-- Weapon card -->
           <div class="col">
             <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
@@ -266,6 +271,152 @@
                 <div class="inspect-weapon-details d-none mt-3">
                   <p class="small text-secondary mb-1">This will become a brief sentence describing the sword in some funny way</p>
                   <p class="small fw-semibold mb-0">Damage: X</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="hat-shop-grid" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 shop-items-grid d-none">
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-top-hat" aria-label="Top Hat"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Top Hat</h5>
+                <p class="card-text text-secondary mb-4">Cost: 10 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="10" data-item-name="Top Hat">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">A classy hat for cats who enter rooms like they own the furniture.</p>
+                  <p class="small fw-semibold mb-0">Style: Fancy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-wizard" aria-label="Wizard Hat"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Wizard Hat</h5>
+                <p class="card-text text-secondary mb-4">Cost: 20 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="20" data-item-name="Wizard Hat">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">Probably magical. Definitely pointy.</p>
+                  <p class="small fw-semibold mb-0">Style: Mystical</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-crown" aria-label="Tiny Crown"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Tiny Crown</h5>
+                <p class="card-text text-secondary mb-4">Cost: 35 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="35" data-item-name="Tiny Crown">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">For the cat who already acts like royalty.</p>
+                  <p class="small fw-semibold mb-0">Style: Regal</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-beanie" aria-label="Beanie"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Beanie</h5>
+                <p class="card-text text-secondary mb-4">Cost: 45 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="45" data-item-name="Beanie">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">Warm, soft, and very serious about naps.</p>
+                  <p class="small fw-semibold mb-0">Style: Cozy</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-pirate" aria-label="Pirate Hat"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Pirate Hat</h5>
+                <p class="card-text text-secondary mb-4">Cost: 60 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="60" data-item-name="Pirate Hat">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">Great for treasure hunts and dramatic staring.</p>
+                  <p class="small fw-semibold mb-0">Style: Adventurous</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-helmet" aria-label="Knight Helmet"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Knight Helmet</h5>
+                <p class="card-text text-secondary mb-4">Cost: 75 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="75" data-item-name="Knight Helmet">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">Protects the head. Does nothing for questionable decisions.</p>
+                  <p class="small fw-semibold mb-0">Style: Armored</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-sombrero" aria-label="Sombrero"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Sombrero</h5>
+                <p class="card-text text-secondary mb-4">Cost: 90 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="90" data-item-name="Sombrero">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">A wide-brimmed masterpiece for sunny quests.</p>
+                  <p class="small fw-semibold mb-0">Style: Festive</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-cap" aria-label="Explorer Cap"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Explorer Cap</h5>
+                <p class="card-text text-secondary mb-4">Cost: 110 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="110" data-item-name="Explorer Cap">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">For cats who believe every closed door is a dungeon entrance.</p>
+                  <p class="small fw-semibold mb-0">Style: Curious</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card shop-item-card h-100 border-0 shadow-sm rounded-4">
+              <div class="shop-hat-preview shop-hat-party" aria-label="Party Hat"></div>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Party Hat</h5>
+                <p class="card-text text-secondary mb-4">Cost: 150 gold</p>
+                <button class="btn btn-primary mt-auto buy-weapon-button" data-cost="150" data-item-name="Party Hat">Buy</button>
+                <button class="btn btn-outline-secondary mt-2 inspect-weapon-button" type="button" aria-expanded="false">Inspect Hat</button>
+                <div class="inspect-weapon-details d-none mt-3">
+                  <p class="small text-secondary mb-1">Celebration equipment for surviving another suspiciously dangerous errand.</p>
+                  <p class="small fw-semibold mb-0">Style: Chaotic</p>
                 </div>
               </div>
             </div>

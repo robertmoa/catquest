@@ -209,6 +209,50 @@ function initializeShopButtons() {
     });
 }
 
+// Switches between the sword and hat grids while keeping the same shop layout.
+function initializeShopTabs() {
+    const shopTitle = document.getElementById("shop-title");
+    const shopSubtitle = document.getElementById("shop-subtitle");
+    const swordGrid = document.getElementById("sword-shop-grid");
+    const hatGrid = document.getElementById("hat-shop-grid");
+    const tabButtons = document.querySelectorAll(".shop-tab-button");
+
+    if (!shopTitle || !shopSubtitle || !swordGrid || !hatGrid || tabButtons.length === 0) {
+        return;
+    }
+
+    const shopCopy = {
+        swords: {
+            title: "Sword Shop",
+            subtitle: "Choose a sword and head back into battle."
+        },
+        hats: {
+            title: "Hat Shop",
+            subtitle: "Choose a hat and head back into battle with style."
+        }
+    };
+
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const targetShop = button.dataset.shopTarget;
+            const showingHats = targetShop === "hats";
+
+            swordGrid.classList.toggle("d-none", showingHats);
+            hatGrid.classList.toggle("d-none", !showingHats);
+
+            shopTitle.textContent = shopCopy[targetShop].title;
+            shopSubtitle.textContent = shopCopy[targetShop].subtitle;
+
+            tabButtons.forEach((tabButton) => {
+                const isActive = tabButton === button;
+                tabButton.classList.toggle("active", isActive);
+                tabButton.classList.toggle("btn-primary", isActive);
+                tabButton.classList.toggle("btn-outline-primary", !isActive);
+            });
+        });
+    });
+}
+
 // Attaches click handlers to each inspect button so the placeholder weapon info can
 // expand and collapse without leaving the shop page.
 function initializeInspectWeaponButtons() {
@@ -270,6 +314,7 @@ function initializeShopAddGoldButton() {
 // Main page setup for the shop.
 function initializeShopPage() {
     initializeShopGoldDisplay();
+    initializeShopTabs();
     initializeShopButtons();
     initializeInspectWeaponButtons();
     initializeMysteryBoxButton();
