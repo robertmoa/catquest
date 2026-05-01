@@ -2,16 +2,18 @@
   position: relative;
   height: calc(100vh - 100px);
 
-  background-image: url('../images/rpgbg.avif');
+  background-image: url('../images/dungeonbg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 
 #player-unit {
   position: absolute;
   bottom: 50px;
-  left: 50px;
+  left: 50%;
 }
 
 #player-hud {
@@ -25,6 +27,7 @@
 #player-sprite {
   width: 96px;
   height: auto;
+  
   image-rendering: pixelated;
 }
 
