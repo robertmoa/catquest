@@ -1,6 +1,6 @@
 from serverstuff import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer,String,ForeignKey
+from sqlalchemy import Integer,String,ForeignKey,JSON
 from datetime import datetime
 
 #===USER STUFF===#
@@ -43,7 +43,7 @@ class UserItem(db.Model):
 #==SHOP ITEM STUFF==# - splits items into weapons and armour for those juicy juicy extra tables
 
 #--Item Table--# (Base class for shop items. The reason it is a base is because weapons and armour have different types of stats)
-class Item(db.model):
+class Item(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(40),)
 
@@ -54,11 +54,11 @@ class Item(db.model):
     cost = Mapped[int] = mapped_column()
     description = Mapped[str] = mapped_column(String(255))
     #because most items wont have special prompts when buying, this doesnt always have to be a non null value
-    specialprompt = Mapped[list] = mapped_column(nullable=True)
+    specialprompt = Mapped[list] = mapped_column(JSON,nullable=True)
     imgpath: Mapped[str] = mapped_column(String(128),nullable=False)
 
     __mapper_args__= {
-        "polymorphic_on": type, 
+        "polymorphic_on": itype, 
         "polymorphic_identity": "default"
     }
 
@@ -83,18 +83,18 @@ class Armour(Item):
 
 #==DUNGEON STUFF==#
 #--Monsters table--#
-class Monster(db.model):
+class Monster(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(40),)
     description = Mapped[str] = mapped_column(String(255))
     imgpath: Mapped[str] = mapped_column(String(128),nullable=False)
     #-Rpg stuff-#
     #Message that will display when battle starts
-    entrymsg = Mapped[str] = mapped_column(String(255),nullable=True)
-    max_hp = Mapped[int] = mapped_column()
-    damage = Mapped[int] = mapped_column()
+    entrymsg: Mapped[str] = mapped_column(String(255),nullable=True)
+    max_hp: Mapped[int] = mapped_column()
+    damage: Mapped[int] = mapped_column()
     #Gold reward, can have this randomly vary
-    reward = Mapped[int] = mapped_column()
+    reward: Mapped[int] = mapped_column()
 
     
 
