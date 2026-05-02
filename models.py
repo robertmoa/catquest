@@ -51,10 +51,10 @@ class Item(db.Model):
     itype: Mapped[str] = mapped_column(String(10),nullable=False)
 
     #Shop stuff
-    cost = Mapped[int] = mapped_column()
-    description = Mapped[str] = mapped_column(String(255))
+    cost: Mapped[int] = mapped_column()
+    description: Mapped[str] = mapped_column(String(255))
     #because most items wont have special prompts when buying, this doesnt always have to be a non null value
-    specialprompt = Mapped[list] = mapped_column(JSON,nullable=True)
+    specialprompt: Mapped[list] = mapped_column(JSON,nullable=True)
     imgpath: Mapped[str] = mapped_column(String(128),nullable=False)
 
     __mapper_args__= {
@@ -86,7 +86,7 @@ class Armour(Item):
 class Monster(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(40),)
-    description = Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(255))
     imgpath: Mapped[str] = mapped_column(String(128),nullable=False)
     #-Rpg stuff-#
     #Message that will display when battle starts
