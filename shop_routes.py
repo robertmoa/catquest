@@ -1,5 +1,5 @@
 from flask import Blueprint, session
-from models import User, UserStat, Sword
+from models import User, UserStat, Sword, Armour
 from sqlalchemy import select
 from serverstuff import db, socketio
 
@@ -189,6 +189,106 @@ SWORD_DATA = [
         "crit_chance": 0.33,
     },
 ]
+
+ARMOUR_DATA = [
+    {
+        "name": "Lensless Glasses",
+        "cost": 10,
+        "description": "A classy hat for cats who enter rooms like they own the furniture.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Lensless Glasses.png",
+        "defense": 2,
+        "dodge_chance": 0.02,
+    },
+    {
+        "name": "Magic Man Hat",
+        "cost": 20,
+        "description": "Probably magical. Definitely pointy.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Magic Man Hat.png",
+        "defense": 4,
+        "dodge_chance": 0.04,
+    },
+    {
+        "name": "Crown Of Pure Lead",
+        "cost": 35,
+        "description": "For the cat who already acts like royalty.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Crown Of Pure Lead.png",
+        "defense": 6,
+        "dodge_chance": 0.06,
+    },
+    {
+        "name": "Slayer of Gods",
+        "cost": 45,
+        "description": "Warm, soft, and very serious about naps.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Slayer of Gods.png",
+        "defense": 8,
+        "dodge_chance": 0.08,
+    },
+    {
+        "name": "Pants",
+        "cost": 60,
+        "description": "Great for treasure hunts and dramatic staring.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Pants.png",
+        "defense": 10,
+        "dodge_chance": 0.10,
+    },
+    {
+        "name": "Sigma Alpha Hat",
+        "cost": 75,
+        "description": "A hat for the alpha cat.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Sigma Alpha Hat.png",
+        "defense": 12,
+        "dodge_chance": 0.12,
+    },
+    {
+        "name": "Cool Person Hat",
+        "cost": 90,
+        "description": "For the coolest cat in town.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Cool Person Hat.png",
+        "defense": 15,
+        "dodge_chance": 0.15,
+    },
+    {
+        "name": "Explorer Cap",
+        "cost": 100,
+        "description": "Ready for adventure.",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Explorer Cap.png",
+        "defense": 18,
+        "dodge_chance": 0.18,
+    },
+    {
+        "name": "Party Hat",
+        "cost": 120,
+        "description": "Time to party!",
+        "specialprompt": None,
+        "imgpath": "/static/images/Hats/Party Hat.png",
+        "defense": 20,
+        "dodge_chance": 0.20,
+    },
+]
+
+def seed_armour():
+    for armour_data in ARMOUR_DATA:
+        armour = db.session.execute(
+            select(Armour).where(Armour.name == armour_data["name"])
+        ).scalar_one_or_none()
+
+        if armour is None:
+            armour = Armour(itype="armour")
+            db.session.add(armour)
+
+        for key, value in armour_data.items():
+            setattr(armour, key, value)
+    
+    db.session.commit()
+    return len(ARMOUR_DATA)
 
 def seed_swords():
     for sword_data in SWORD_DATA:

@@ -1,7 +1,7 @@
 from flask import Flask
 from serverstuff import socketio, db
 from routes import main
-from shop_routes import seed_swords
+from shop_routes import seed_swords, seed_armour
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret!"
@@ -16,4 +16,5 @@ app.register_blueprint(main)
 with app.app_context():
     db.create_all()
     sword_count = seed_swords()
+    hat_count = seed_armour()
     print(f"database done")
