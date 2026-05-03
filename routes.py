@@ -71,9 +71,6 @@ def get_user_stats():
         select(User).where(User.username == username)
     ).scalar_one_or_none()
 
-    if user is None:
-        return jsonify({"error": "User not found"}), 404
-
     # make sure UserStat exists
     if user.data is None:
         user.data = UserStat(gold=0, xp=0, level=0)
@@ -84,6 +81,19 @@ def get_user_stats():
         "xp": user.data.xp,
         "level": user.data.level
     })
+
+@main.route("/get_user_info", methods=["GET"])
+def get_user_info():
+    username = session.get("username")
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    return jsonify({
+        "idnum": user.idnum,
+        "username": user.username,
+    })
+            
  
  
 

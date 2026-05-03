@@ -7,6 +7,21 @@ const MYSTERY_BOX_MIN_GOLD_REWARD = 50;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
 
+
+async function loadUsername() {
+    const response = await fetch("/get_user_info");
+    const data = await response.json();
+
+    const element = document.getElementById("player-username");
+
+    if (!element) return;
+
+    element.textContent = data.username;
+}
+
+document.addEventListener("DOMContentLoaded", loadUsername);
+
+
 // Gets the player's current gold total from the database.
 async function getPlayerGold() {
     const response = await fetch("/get_user_stats");
