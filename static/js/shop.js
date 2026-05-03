@@ -305,8 +305,18 @@ function initializeShopAddGoldButton() {
         return;
     }
 
-    addGoldButton.addEventListener("click", () => {
-        addPlayerGold(500);
+    addGoldButton.addEventListener("click", async () => {
+        const response = await fetch("/shop/add-gold", {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            window.alert("Could not add gold. Make sure you are logged in.");
+            return;
+        }
+
+        const result = await response.json();
+        setPlayerGold(result.gold);
         renderShopGold();
     });
 }

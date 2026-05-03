@@ -1,5 +1,5 @@
-from flask import render_template, Blueprint, redirect, request, url_for, session
-from models import User
+from flask import render_template, Blueprint, redirect, request, url_for, session, jsonify
+from models import User, UserStat
 from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
 from serverstuff import db,users
@@ -57,3 +57,27 @@ def dungeon():
 @main.route("/shop")
 def shop():
     return render_template("shop.html")
+
+
+@main.route("/shop/add-gold", methods=["POST"])
+def add_gold():
+    username = session.get("username")
+
+    if username is None:
+        return jsonify({"error": "Not logged in"}), 401
+
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    if user.data is None:
+        user.data = UserStat(gold=0, xp=0, level=0)
+
+    amount = 500
+    user.data.gold += amount
+    db.session.commit()
+
+    return jsonify({"gold": user.data.gold, "added": amount})
