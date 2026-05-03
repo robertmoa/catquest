@@ -287,23 +287,25 @@ function initializeMysteryBoxButton() {
 
 // Starts the sidebar gold display and listens for future gold updates.
 function initializeShopGoldDisplay() {
-    if (!document.getElementById("shop-gold-amount")) {
+    const goldElement = document.getElementById("shop-gold-amount");
+
+    if (!goldElement) {
         return;
     }
 
-    renderShopGold();
-    window.addEventListener("playerGoldUpdated", (event) => {
-        updateShopGoldDisplay(event.detail.gold);
-    });
+    // fetch gold from database on page load
+    fetch("/get_user_stats")
+        .then(response => response.json())
+        .then(data => {
+            updateShopGoldDisplay(data.gold);
+        });
 }
 
 // Dev helper button that adds 500 gold for quick testing.
 function initializeShopAddGoldButton() {
     const addGoldButton = document.getElementById("add-gold-button");
 
-    if (!addGoldButton) {
-        return;
-    }
+
 
     addGoldButton.addEventListener("click", async () => {
         const response = await fetch("/shop/add-gold", {
