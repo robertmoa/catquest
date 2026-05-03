@@ -16,4 +16,4 @@ app.register_blueprint(main)
 with app.app_context():
     db.create_all()
     sword_count = seed_swords()
-    print(f"database done, seeded {sword_count} swords")
+    print(f"database done")

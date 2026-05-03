@@ -7,14 +7,27 @@ const MYSTERY_BOX_MIN_GOLD_REWARD = 50;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
 
+const shopSocket = io();
+
+function socketRequest(eventName, data = {}) {
+    return new Promise((resolve) => {
+        shopSocket.emit(eventName, data, (response) => {
+            resolve(response || { success: false, error: "No response from server" });
+        });
+    });
+}
 
 async function loadUsername() {
-    const response = await fetch("/get_user_info");
-    const data = await response.json();
+    const data = await socketRequest("get_user_info");
 
     const element = document.getElementById("player-username");
 
     if (!element) return;
+
+    if (!data.success) {
+        element.textContent = "Not logged in";
+        return;
+    }
 
     element.textContent = data.username;
 }
@@ -24,13 +37,12 @@ document.addEventListener("DOMContentLoaded", loadUsername);
 
 // Gets the player's current gold total from the database.
 async function getPlayerGold() {
-    const response = await fetch("/get_user_stats");
+    const data = await socketRequest("get_user_stats");
 
-    if (!response.ok) {
+    if (!data.success) {
         return 0;
     }
 
-    const data = await response.json();
     const gold = Number(data.gold);
 
     if (Number.isNaN(gold) || gold < 0) {
@@ -42,40 +54,29 @@ async function getPlayerGold() {
 
 // Adds gold to the player's database total.
 async function addPlayerGold(amount) {
-    const response = await fetch("/shop/add-gold", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ amount })
-    });
+    const data = await socketRequest("add_gold", { amount });
 
-    if (!response.ok) {
+    if (!data.success) {
         return null;
     }
 
-    const data = await response.json();
     updateShopGoldDisplay(data.gold);
     return data.gold;
 }
 
 // Spends gold from the player's database total.
 async function spendPlayerGold(cost) {
-    const response = await fetch("/shop/spend-gold", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ cost })
-    });
+    const data = await socketRequest("spend_gold", { cost });
 
-    if (!response.ok) {
+    if (!data.success) {
+        if (data.gold !== undefined) {
+            updateShopGoldDisplay(data.gold);
+        }
         return false;
     }
 
-    const data = await response.json();
     updateShopGoldDisplay(data.gold);
-    return data.success;
+    return true;
 }
 
 // Creates a gold reward between 50 and 250, but with extra weight toward the lower end.
