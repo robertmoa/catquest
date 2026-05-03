@@ -12,16 +12,21 @@ shop = Blueprint("shop", __name__, url_prefix="/shop")
 def add_gold():
     username = session.get("username")
 
+    if username is None:
+        return jsonify({"error": "Not logged in"}), 401
 
     user = db.session.execute(
         select(User).where(User.username == username)
     ).scalar_one_or_none()
 
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
 
     if user.data is None:
         user.data = UserStat(gold=0, xp=0, level=0)
 
-    amount = 500
+    data = request.get_json(silent=True) or {}
+    amount = int(data.get("amount", 500))
     user.data.gold += amount
     db.session.commit()
 
@@ -29,7 +34,8 @@ def add_gold():
 
 
 @shop.route("/buy-item", methods=["POST"])
-def buy_item():
+@shop.route("/spend-gold", methods=["POST"])
+def spend_gold():
     username = session.get("username")
 
     if username is None:
@@ -38,3 +44,25 @@ def buy_item():
     user = db.session.execute(
         select(User).where(User.username == username)
     ).scalar_one_or_none()
+
+    if user is None:
+        return jsonify({"error": "User not found"}), 404
+
+    if user.data is None:
+        user.data = UserStat(gold=0, xp=0, level=0)
+    
+    data = request.get_json(silent=True) or {}
+    cost = data.get("cost")
+
+    if cost is None:
+        return jsonify({"error": "Missing cost"}), 400
+
+    cost = int(cost)
+
+    if user.data.gold < cost:
+        return jsonify({"success": False, "gold": user.data.gold}), 400
+
+    user.data.gold -= cost
+    db.session.commit()
+
+    return jsonify({"success": True, "gold": user.data.gold})

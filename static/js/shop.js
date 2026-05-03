@@ -1,6 +1,3 @@
-// localStorage key for the player's gold so the shop can remember it between refreshes.
-const PLAYER_GOLD_STORAGE_KEY = "catquest_player_gold";
-
 // Cost and outcome settings for the mystery box feature.
 const MYSTERY_BOX_COST = 100;
 const MYSTERY_BOX_JACKPOT_GOLD = 5000;
@@ -10,47 +7,60 @@ const MYSTERY_BOX_MIN_GOLD_REWARD = 1;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
 
-// Reads the player's gold from localStorage.
-// If the saved value is missing or invalid, we repair it by resetting to 0.
-function getPlayerGold() {
-    const storedGold = Number(localStorage.getItem(PLAYER_GOLD_STORAGE_KEY));
+// Gets the player's current gold total from the database.
+async function getPlayerGold() {
+    const response = await fetch("/get_user_stats");
 
-    if (Number.isNaN(storedGold)) {
-        localStorage.setItem(PLAYER_GOLD_STORAGE_KEY, "0");
+    if (!response.ok) {
         return 0;
     }
 
-    return storedGold;
+    const data = await response.json();
+    const gold = Number(data.gold);
+
+    if (Number.isNaN(gold) || gold < 0) {
+        return 0;
+    }
+
+    return gold;
 }
 
-// Writes a safe, non-negative gold value back to localStorage.
-// We also broadcast a small event so anything showing gold on the page can update itself.
-function setPlayerGold(amount) {
-    const safeAmount = Math.max(0, Number(amount) || 0);
-    localStorage.setItem(PLAYER_GOLD_STORAGE_KEY, String(safeAmount));
-    window.dispatchEvent(new CustomEvent("playerGoldUpdated", {
-        detail: { gold: safeAmount }
-    }));
-    return safeAmount;
+// Adds gold to the player's database total.
+async function addPlayerGold(amount) {
+    const response = await fetch("/shop/add-gold", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ amount })
+    });
+
+    if (!response.ok) {
+        return null;
+    }
+
+    const data = await response.json();
+    updateShopGoldDisplay(data.gold);
+    return data.gold;
 }
 
-// Adds gold on top of the current total.
-function addPlayerGold(amount) {
-    return setPlayerGold(getPlayerGold() + (Number(amount) || 0));
-}
+// Spends gold from the player's database total.
+async function spendPlayerGold(cost) {
+    const response = await fetch("/shop/spend-gold", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ cost })
+    });
 
-// Tries to subtract gold for a purchase.
-// Returns false if the player cannot afford the cost.
-function spendPlayerGold(amount) {
-    const cost = Math.max(0, Number(amount) || 0);
-    const currentGold = getPlayerGold();
-
-    if (currentGold < cost) {
+    if (!response.ok) {
         return false;
     }
 
-    setPlayerGold(currentGold - cost);
-    return true;
+    const data = await response.json();
+    updateShopGoldDisplay(data.gold);
+    return data.success;
 }
 
 // Creates a gold reward between 1 and 250, but with extra weight toward the lower end.
@@ -71,9 +81,9 @@ function updateShopGoldDisplay(goldAmount) {
     }
 }
 
-// Re-renders the visible gold count using the current saved value.
-function renderShopGold() {
-    updateShopGoldDisplay(getPlayerGold());
+// Re-renders the visible gold count using the database value.
+async function renderShopGold() {
+    updateShopGoldDisplay(await getPlayerGold());
 }
 
 // Builds the confirmation prompt list for a normal shop purchase.
@@ -105,7 +115,7 @@ function getPurchaseConfirmationPrompts(cost, itemName) {
 }
 
 // Handles buying one of the normal shop items.
-function buyShopItem(cost, itemName) {
+async function buyShopItem(cost, itemName) {
     const confirmationPrompts = getPurchaseConfirmationPrompts(cost, itemName);
 
     for (const promptMessage of confirmationPrompts) {
@@ -116,14 +126,13 @@ function buyShopItem(cost, itemName) {
         }
     }
 
-    const wasPurchased = spendPlayerGold(cost);
+    const wasPurchased = await spendPlayerGold(cost);
 
     if (!wasPurchased) {
         window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
         return false;
     }
 
-    renderShopGold();
     window.alert("Purchased " + itemName + " for " + cost + " gold.");
     return true;
 }
@@ -158,7 +167,7 @@ function rollMysteryBoxOutcome() {
 // 2. Charge 100 gold.
 // 3. Roll the random outcome.
 // 4. Apply and announce the reward.
-function buyMysteryBox() {
+async function buyMysteryBox() {
     const confirmedPurchase = window.confirm(
         "Buy a Mystery Box for " + MYSTERY_BOX_COST + " gold?"
     );
@@ -167,27 +176,23 @@ function buyMysteryBox() {
         return false;
     }
 
-    const wasPurchased = spendPlayerGold(MYSTERY_BOX_COST);
+    const wasPurchased = await spendPlayerGold(MYSTERY_BOX_COST);
 
     if (!wasPurchased) {
         window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work fool");
         return false;
     }
 
-    renderShopGold();
-
     const outcome = rollMysteryBoxOutcome();
 
     if (outcome.type === "jackpot") {
-        addPlayerGold(outcome.goldAmount);
-        renderShopGold();
+        await addPlayerGold(outcome.goldAmount);
         window.alert("JACKPOT! The mystery box spat out " + outcome.goldAmount + " gold.");
         return true;
     }
 
     if (outcome.type === "gold") {
-        addPlayerGold(outcome.goldAmount);
-        renderShopGold();
+        await addPlayerGold(outcome.goldAmount);
         window.alert("The mystery box gave you " + outcome.goldAmount + " gold.");
         return true;
     }
@@ -285,7 +290,7 @@ function initializeMysteryBoxButton() {
     });
 }
 
-// Starts the sidebar gold display and listens for future gold updates.
+// Fetches the player's gold from the database and updates the display when the shop page loads, using the players gold from the database.
 function initializeShopGoldDisplay() {
     const goldElement = document.getElementById("shop-gold-amount");
 
@@ -293,34 +298,27 @@ function initializeShopGoldDisplay() {
         return;
     }
 
-    // fetch gold from database on page load
-    fetch("/get_user_stats")
-        .then(response => response.json())
-        .then(data => {
-            updateShopGoldDisplay(data.gold);
-        });
+    renderShopGold();
 }
 
-// Dev helper button that adds 500 gold for quick testing.
+// Dev helper button that adds 500 gold, that actually works with the database.
 function initializeShopAddGoldButton() {
     const addGoldButton = document.getElementById("add-gold-button");
 
-
+    if (!addGoldButton) {
+        return;
+    }
 
     addGoldButton.addEventListener("click", async () => {
-        const response = await fetch("/shop/add-gold", {
-            method: "POST"
-        });
+        const gold = await addPlayerGold(500);
 
-        if (!response.ok) {
-            window.alert("Could not add gold. Make sure you are logged in.");
+        if (gold === null) {
+            window.alert("An error occurred while adding gold.");
             return;
         }
 
-        const result = await response.json();
-        updateShopGoldDisplay(result.gold);
     });
-}
+}   
 
 // Main page setup for the shop.
 function initializeShopPage() {
@@ -334,7 +332,6 @@ function initializeShopPage() {
 
 // Expose a few helpers on window so they can be tested from the browser console.
 window.getPlayerGold = getPlayerGold;
-window.setPlayerGold = setPlayerGold;
 window.addPlayerGold = addPlayerGold;
 window.spendPlayerGold = spendPlayerGold;
 window.buyMysteryBox = buyMysteryBox;
