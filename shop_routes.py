@@ -33,7 +33,6 @@ def add_gold():
     return jsonify({"gold": user.data.gold, "added": amount})
 
 
-@shop.route("/buy-item", methods=["POST"])
 @shop.route("/spend-gold", methods=["POST"])
 def spend_gold():
     username = session.get("username")
