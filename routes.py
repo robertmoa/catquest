@@ -58,9 +58,10 @@ def dungeon():
 def shop():
     return render_template("shop.html")
 
-
-@main.route("/shop/add-gold", methods=["POST"])
-def add_gold():
+ 
+ 
+@main.route("/get_user_stats", methods=["GET"])
+def get_user_stats():
     username = session.get("username")
 
     if username is None:
@@ -73,11 +74,18 @@ def add_gold():
     if user is None:
         return jsonify({"error": "User not found"}), 404
 
+    # make sure UserStat exists
     if user.data is None:
         user.data = UserStat(gold=0, xp=0, level=0)
+        db.session.commit()
 
-    amount = 500
-    user.data.gold += amount
-    db.session.commit()
+    return jsonify({
+        "gold": user.data.gold,
+        "xp": user.data.xp,
+        "level": user.data.level
+    })
+ 
+ 
 
-    return jsonify({"gold": user.data.gold, "added": amount})
+
+

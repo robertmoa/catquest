@@ -318,8 +318,7 @@ function initializeShopAddGoldButton() {
         }
 
         const result = await response.json();
-        setPlayerGold(result.gold);
-        renderShopGold();
+        updateShopGoldDisplay(result.gold);
     });
 }
 

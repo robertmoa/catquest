@@ -1,6 +1,7 @@
 from flask import Flask
 from serverstuff import socketio, db
 from routes import main
+from shop_routes import shop
 from flask_migrate import Migrate
 
 def create_app():
@@ -15,6 +16,7 @@ def create_app():
     socketio.init_app(app)
     # register the routes
     app.register_blueprint(main)
+    app.register_blueprint(shop)
 
     import models
 
