@@ -119,7 +119,7 @@ function buyShopItem(cost, itemName) {
     const wasPurchased = spendPlayerGold(cost);
 
     if (!wasPurchased) {
-        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work fool");
+        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
         return false;
     }
 
