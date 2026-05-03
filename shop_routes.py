@@ -129,7 +129,7 @@ SWORD_DATA = [
     {
         "name": "Nuclear Flamebringer Deathknife",
         "cost": 80,
-        "description": "Absolutely too many dangerous words in one sword.",
+        "description": "His brothers name is Dave.",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/Nuclear Flamebringer Deathknife.png",
         "attack": 30,
@@ -163,7 +163,6 @@ SWORD_DATA = [
     },
 ]
 
-
 def seed_swords():
     for sword_data in SWORD_DATA:
         sword = db.session.execute(
@@ -177,7 +176,6 @@ def seed_swords():
 
         for key, value in sword_data.items():
             setattr(sword, key, value)
-    
     
     db.session.commit()
     return len(SWORD_DATA)
