@@ -3,7 +3,7 @@ const MYSTERY_BOX_COST = 100;
 const MYSTERY_BOX_JACKPOT_GOLD = 5000;
 const MYSTERY_BOX_JACKPOT_CHANCE = 0.1;
 const MYSTERY_BOX_NOTHING_CHANCE = 20;
-const MYSTERY_BOX_MIN_GOLD_REWARD = 1;
+const MYSTERY_BOX_MIN_GOLD_REWARD = 50;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
 
@@ -63,7 +63,7 @@ async function spendPlayerGold(cost) {
     return data.success;
 }
 
-// Creates a gold reward between 1 and 250, but with extra weight toward the lower end.
+// Creates a gold reward between 50 and 250, but with extra weight toward the lower end.
 // `Math.random()` is naturally even, so we raise it to a power above 1.
 // That pulls more results closer to 0, which means smaller gold rewards happen more often.
 function rollWeightedMysteryBoxGoldReward() {
@@ -179,7 +179,7 @@ async function buyMysteryBox() {
     const wasPurchased = await spendPlayerGold(MYSTERY_BOX_COST);
 
     if (!wasPurchased) {
-        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work fool");
+        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work");
         return false;
     }
 
@@ -197,7 +197,7 @@ async function buyMysteryBox() {
         return true;
     }
 
-    window.alert("The mystery box contained absolutely nothing. Brutal.");
+    window.alert("The mystery box contained absolutely nothing. Unlucky.");
     return true;
 }
 
@@ -332,8 +332,7 @@ function initializeShopPage() {
 
 // Expose a few helpers on window so they can be tested from the browser console.
 window.getPlayerGold = getPlayerGold;
-window.addPlayerGold = addPlayerGold;
-window.spendPlayerGold = spendPlayerGold;
+
 window.buyMysteryBox = buyMysteryBox;
 window.renderShopGold = renderShopGold;
 window.buyShopItem = buyShopItem;
