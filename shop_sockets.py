@@ -1,5 +1,5 @@
 from flask import Blueprint, session
-from models import User, UserStat, Sword, Armour,Item
+from models import User, UserItem, UserStat, Sword, Armour,Item
 from sqlalchemy import select
 from serverstuff import db, socketio
 
@@ -11,6 +11,7 @@ def handle_getting_items(data):
     payload = [item.to_dict() for item in all_items]
     print(payload)
     return payload
+
 @socketio.on("add_gold")
 def handle_add_gold(data):
     username = session.get("username")
@@ -72,6 +73,90 @@ def handle_spend_gold(data):
     db.session.commit()
 
     return {"success": True, "gold": user.data.gold}
+
+
+@socketio.on("own_item")
+def own_item(data):
+    username = session.get("username")
+
+    if username is None:
+        return {"success": False, "error": "Not logged in"}
+
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    if user is None:
+        return {"success": False, "error": "User not found"}
+
+    data = data or {}
+    item_id = data.get("item_id")
+
+    if item_id is None:
+        return {"success": False, "error": "Missing item_id"}
+
+    existing = db.session.execute(
+        select(UserItem).where(
+            UserItem.user_id == user.id,
+            UserItem.item_id == item_id
+        )
+    ).scalar_one_or_none()
+
+    if existing is not None:
+        return {"success": False, "error": "User already owns this item"}
+
+
+    item = db.session.execute(
+        select(Item).where(Item.id == item_id)
+    ).scalar_one_or_none()
+
+    if item is None:
+        return {"success": False, "error": "Item not found"}
+
+
+    user_item = UserItem(
+        user_id=user.id,
+        item_id=item.id
+    )
+
+    db.session.add(user_item)
+    db.session.commit()
+
+    return {"success": True}
+
+
+@socketio.on("check_own_item")
+def check_own_item(data):
+    username = session.get("username")
+
+    if username is None:
+        return {"owns": False}
+
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    if user is None:
+        return {"owns": False}
+
+    data = data or {}
+    item_id = data.get("item_id")
+
+    if item_id is None:
+        return {"owns": False}
+
+    existing = db.session.execute(
+        select(UserItem).where(
+            UserItem.user_id == user.id,
+            UserItem.item_id == item_id
+        )
+    ).scalar_one_or_none()
+
+    return {"owns": existing is not None}
+
+
+
+
 
 
 

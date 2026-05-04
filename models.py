@@ -33,6 +33,7 @@ class UserStat(db.Model):
     user: Mapped["User"] = relationship(back_populates="data")
 
 
+
 #--USER ITEM TABLE--# (Stores record of who has purchased, linked with item and user table to give each entry in those tables a owns/owned by list)
 class UserItem(db.Model):
     __tablename__ = "user_item"

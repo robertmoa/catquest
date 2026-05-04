@@ -133,7 +133,7 @@ function getPurchaseConfirmationPrompts(cost, itemName) {
 }
 
 // Handles buying one of the normal shop items.
-async function buyShopItem(cost, itemName) {
+async function buyShopItem(cost, itemName, item_id) {
     const confirmationPrompts = getPurchaseConfirmationPrompts(cost, itemName);
 
     for (const promptMessage of confirmationPrompts) {
@@ -144,6 +144,11 @@ async function buyShopItem(cost, itemName) {
         }
     }
 
+    if (await checkOwns(item_id)) {
+        window.alert("You already own this item");
+        return false;
+    }
+
     const wasPurchased = await spendPlayerGold(cost);
 
     if (!wasPurchased) {
@@ -151,9 +156,30 @@ async function buyShopItem(cost, itemName) {
         return false;
     }
 
+    const itemAdded = await owns(item_id);
+
+    if (!itemAdded) {
+        window.alert("Purchase failed on server. Gold may still have been deducted.");
+        return false;
+    }
+
     window.alert("Purchased " + itemName + " for " + cost + " gold.");
     return true;
 }
+
+async function owns(item_id) {
+    const data = await socketRequest("own_item", { item_id: item_id });
+
+    return data.success;
+}
+
+async function checkOwns(item_id) {
+    const data = await socketRequest("check_own_item", { item_id: item_id });
+
+    return data.owns;
+}
+
+
 
 // Rolls the mystery box result using the requested gold-only probability split:
 // 0.1% jackpot, 20% nothing, and the remaining chance becomes a weighted gold reward.
@@ -227,7 +253,8 @@ function initializeShopButtons() {
         button.addEventListener("click", () => {
             const cost = Number(button.dataset.cost);
             const itemName = button.dataset.itemName || "item";
-            buyShopItem(cost, itemName);
+            const itemId = button.dataset.itemId;
+            buyShopItem(cost, itemName, itemId);
         });
     });
 }
@@ -353,6 +380,7 @@ async function initializeShopCards() {
 
         card.querySelector(".buy-weapon-button").dataset.cost = String(item.cost);
         card.querySelector(".buy-weapon-button").dataset.itemName = item.name;
+        card.querySelector(".buy-weapon-button").dataset.itemId = String(item.id);
         card.querySelector('.card-image-top').src = item.imgpath;
         card.querySelector('.card-title').textContent = item.name;
         card.querySelector('.card-text.text-secondary.mb-4').textContent = `Price: ${item.cost}`;
@@ -393,6 +421,7 @@ window.buyMysteryBox = buyMysteryBox;
 window.renderShopGold = renderShopGold;
 window.buyShopItem = buyShopItem;
 window.initializeShopPage = initializeShopPage;
+window.checkOwns = checkOwns;
 
 // Wait until the page is loaded before we try to find buttons and DOM elements.
 document.addEventListener("DOMContentLoaded", () => {
