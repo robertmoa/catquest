@@ -9,7 +9,6 @@ const chatBox = document.getElementById('chat_box')
 chatButton.addEventListener('click', function() {
     
     const data = {
-        userid: window.username,
         txt: chatInput.value
     }
     socket.emit('chatmsg', data);
