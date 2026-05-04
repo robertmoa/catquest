@@ -28,45 +28,79 @@
         </div>
         <div class="battle-page">
             <main id="battle-area" class="border border-4 border-light-subtle rounded-3" aria-label="Dungeon battle area">
+                <section id="battle-log" aria-label="Battle log">
+                    <div class="battle-log-messages" id="log-messages"></div>
+                </section>
                 <section id="player-unit" class="battle-unit" aria-label="Player">
+                    <div id="player-hud-wrapper">
                     <div id="player-hud" class="unit-panel">
-                        <div class="hp-row">
-                            <span class="hp-label">HP</span>
-                            <span id="player-hp-text" class="hp-text">30 / 30</span>
+                        <div class="stats-row">
+                            <span class="stat-label">HP</span>
+                            <span id="player-hp-text" class="stat-value">30 / 30</span>
                         </div>
                         <div class="hp-bar-bg" aria-hidden="true">
                             <div id="player-hp-fill" class="hp-bar-fill"></div>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Gold</span>
+                            <span id="player-gold" class="stat-value">0</span>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Level</span>
+                            <span id="player-level" class="stat-value">1</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stat-label">XP</span>
+                            <span id="player-xp" class="stat-value">0 / 50</span>
+                        </div>
+                        <div class="xp-bar-bg" aria-hidden="true">
+                            <div id="player-xp-fill" class="xp-bar-fill"></div>
+                        </div>
+
+                        <div class="stats-row" style="margin-top: 8px;">
+                            <span class="stat-label">Attack</span>
+                            <span id="player-attack" class="stat-value">5</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stat-label">Defence</span>
+                            <span id="player-defence" class="stat-value">0</span>
+                        </div>
+                        <div class="stats-row" id="stamina-row" style="display: none;">
+                            <span class="stat-label">Stamina</span>
+                            <span id="player-stamina" class="stat-value">0 / 0</span>
+                        </div>
+                        <div class="stats-row">
+                            <span class="stat-label">Enemies Defeated</span>
+                            <span id="enemy-count" class="stat-value">0</span>
                         </div>
                     </div>
 
                     <img id="player-sprite" src="{{ url_for('static', filename='images/catsprite-s.png') }}" alt="Player cat sprite">
 
-                    <div id="player-actions" class="unit-actions">
-                        <button id="btn-damage" class="btn btn-outline-danger btn-sm" type="button">Do 5 damage</button>
-                        <button id="btn-heal" class="btn btn-outline-success btn-sm" type="button"><span
-                            class="placeholder col-3 placeholder-lg bg-primary"
-                        ></span>
-                        </button>
-                        <button id="btn-run" class="btn btn-outline-secondary btn-sm" type="button">Run</button>
-                        <button id="btn-start" class="btn btn-outline-primary btn-sm" type="button">New Battle</button>
+                    <div id="player-actions" class="unit-actions" aria-label="Action buttons">
+                        <!-- Buttons rendered dynamically by dungeon.js -->
                     </div>
                 </section>
 
                 <section id="enemy-unit" class="battle-unit" aria-label="Enemy">
                     <div id="enemy-hud" class="unit-panel">
                         <div class="hp-row">
-                            <span class="hp-label">HP</span>
+                            <span class="hp-label" id="enemy-name">Angry Cat #1</span>
                             <span id="enemy-hp-text" class="hp-text">20 / 20</span>
                         </div>
                         <div class="hp-bar-bg" aria-hidden="true">
                             <div id="enemy-hp-fill" class="hp-bar-fill"></div>
                         </div>
+                    </div>
                     <img id="enemy-sprite" src="{{ url_for('static', filename='images/ecatsprite.png') }}" alt="Enemy cat sprite">
                 </section>
             </main>
         </div>
     </div>
 
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>
 </body>
 </html>
