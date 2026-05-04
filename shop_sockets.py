@@ -1,11 +1,16 @@
 from flask import Blueprint, session
-from models import User, UserStat, Sword, Armour
+from models import User, UserStat, Sword, Armour,Item
 from sqlalchemy import select
 from serverstuff import db, socketio
 
 shop = Blueprint("shop", __name__, url_prefix="/shop")
 
-
+@socketio.on("get_all_items")
+def handle_getting_items(data):
+    all_items = Item.query.all()
+    payload = [item.to_dict() for item in all_items]
+    print(payload)
+    return payload
 @socketio.on("add_gold")
 def handle_add_gold(data):
     username = session.get("username")
@@ -179,7 +184,7 @@ SWORD_DATA = [
         "description": "Nobody knows if this is a good idea, especially the sword.",
         "specialprompt": [
             "Are you sure you want to purchase this sword",
-            "Youre 100% certain?",
+            "Youre super certain?",
             "But are you really sure? Like deadset you know you want this",
             "This is your fourth confirmation. You must really want this, right?",
             "Last chance! Theres no going back now",

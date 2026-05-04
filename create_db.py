@@ -1,7 +1,7 @@
 from flask import Flask
 from serverstuff import socketio, db
 from routes import main
-from shop_routes import seed_swords, seed_armour
+from shop_sockets import seed_swords, seed_armour
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret!"

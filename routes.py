@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, redirect, request, url_for, session
-from models import User, UserStat
+from models import User
 from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
 from serverstuff import db, users, socketio
@@ -58,51 +58,6 @@ def dungeon():
 def shop():
     return render_template("shop.html")
 
-@socketio.on("get_user_stats")
-def get_user_stats(data=None):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
-
-    # make sure UserStat exists
-    if user.data is None:
-        user.data = UserStat(gold=0, xp=0, level=0)
-        db.session.commit()
-
-    return {
-        "success": True,
-        "gold": user.data.gold,
-        "xp": user.data.xp,
-        "level": user.data.level
-    }
-
-@socketio.on("get_user_info")
-def get_user_info(data=None):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
-
-    return {
-        "success": True,
-        "idnum": user.idnum,
-        "username": user.username,
-    }
             
  
  

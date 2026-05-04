@@ -1,23 +1,17 @@
-from flask_socketio import emit, join_room, leave_room, disconnect
-from flask import request
+from flask_socketio import emit, join_room, leave_room
+from flask import request,session
 from serverstuff import socketio, users
 #gets the users dictionary from serverstuff
 
 
-
-
-    
+@socketio.on('connect')
+def handle_connect():
+    users[session["username"]] = request.sid
+    print(users)
+    join_room(session["username"])
 
 @socketio.on('disconnect')
 def handle_disconnect():
-
-    data = {
-        'userid': 'CatQuest',
-        'txt': f"{users.get(request.sid, 'Unknown user')} has left"
-    }
-    emit('chatmsg', data, broadcast=True)
-
-    print(f"{request.sid} has disconnected, removing them from users...")
-    #finally remove the user from the dictionary
-    users.pop(request.sid, None)
+    leave_room(session["username"])
+    users.pop(session["username"])
     print(users)

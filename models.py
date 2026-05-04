@@ -1,6 +1,6 @@
 from serverstuff import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String,ForeignKey,JSON
+from sqlalchemy import String,ForeignKey,JSON,DateTime, func
 from datetime import datetime
 
 #===USER STUFF===#
@@ -8,8 +8,8 @@ from datetime import datetime
 #--BASE USER TABLE--# (The reason there is the user and user stat table is for readability, and speed)
 
 class User(db.Model):
-    __tablename__ = 'user'
-    idnum: Mapped[int] = mapped_column(primary_key=True)
+    __tablename__ = "user"
+    id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(20),unique =True, nullable=False)
     password: Mapped[str] = mapped_column(String(200),nullable=False)
 
@@ -22,8 +22,9 @@ class User(db.Model):
 #--USER STAT TABLE--# (Stores gold value, xp, level etc etc)
 
 class UserStat(db.Model):
+    __tablename__ = "user_stat"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.idnum"),unique=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"),unique=True)
     #shop
     gold: Mapped[int] = mapped_column(default=0)
     #dungeon
@@ -34,10 +35,11 @@ class UserStat(db.Model):
 
 #--USER ITEM TABLE--# (Stores record of who has purchased, linked with item and user table to give each entry in those tables a owns/owned by list)
 class UserItem(db.Model):
+    __tablename__ = "user_item"
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.idnum",ondelete="CASCADE"),nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id",ondelete="CASCADE"),nullable=False)
     item_id: Mapped[int] = mapped_column(ForeignKey("item.id",ondelete="CASCADE"),nullable=False)
-    purchased: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    purchased: Mapped[datetime] = mapped_column(DateTime,server_default=func.now())
     user: Mapped["User"] = relationship(back_populates="items")
     item: Mapped["Item"] = relationship(back_populates="owners")
 
@@ -46,6 +48,7 @@ class UserItem(db.Model):
 
 #--Item Table--# (Base class for shop items. The reason it is a base is because weapons and armour have different types of stats)
 class Item(db.Model):
+    __tablename__ = "item"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(40),)
 
@@ -66,7 +69,30 @@ class Item(db.Model):
         "polymorphic_identity": "default"
     }
 
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "name": self.name,
+            "type": self.itype,
+            "cost": self.cost,
+            "description": self.description,
+            "imgpath": self.imgpath,
+        }
+
+        #subclass-specific fields
+        if isinstance(self, Sword):
+            data.update({
+                "attack": self.attack,
+                "crit_chance": self.crit_chance
+            })
+        elif isinstance(self, Armour):
+            data.update({
+                "defense": self.defense,
+                "dodge_chance": self.dodge_chance
+            })
+        return data
 class Sword(Item):
+    __tablename__ = "sword"
 
     id: Mapped[int] = mapped_column(ForeignKey("item.id"), primary_key=True)
     attack: Mapped[int] = mapped_column()
@@ -76,7 +102,7 @@ class Sword(Item):
         "polymorphic_identity": "sword",
     }
 class Armour(Item):
-
+    __tablename__ = "armour"
     id: Mapped[int] = mapped_column(ForeignKey("item.id"), primary_key=True)
     defense: Mapped[int] = mapped_column()
     dodge_chance: Mapped[float] = mapped_column()
@@ -88,6 +114,7 @@ class Armour(Item):
 #==DUNGEON STUFF==#
 #--Monsters table--#
 class Monster(db.Model):
+    __tablename__ = "monster"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(40),)
     description: Mapped[str] = mapped_column(String(255))
@@ -108,9 +135,10 @@ class Monster(db.Model):
 # also will be used for showing correct chat history for the users session, as websockets reset on page loads)
 
 class ChatHistory(db.Model):
+    __tablename__ = "chat_history"
     id: Mapped[int] = mapped_column(primary_key=True)
-    time_sent: Mapped[datetime] = mapped_column(nullable=True)
+    time_sent: Mapped[datetime] = mapped_column(DateTime,nullable=True,server_default=func.now())
     from_user: Mapped[str] = mapped_column(String(16),nullable = False)
     #as only some messages are /w messages, this will only be sometimes filled
-    to_user: Mapped[str] = mapped_column(String(16),nullable=True)
+    to_user: Mapped[str] = mapped_column(String(16),nullable=True,default=None)
     message: Mapped[str] = mapped_column(String(255))

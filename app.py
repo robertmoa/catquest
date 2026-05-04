@@ -1,7 +1,7 @@
 from flask import Flask
 from serverstuff import socketio, db
 from routes import main
-from shop_routes import shop
+from shop_sockets import shop
 from flask_migrate import Migrate
 
 def create_app():
@@ -19,12 +19,10 @@ def create_app():
     app.register_blueprint(shop)
 
     import models
-
-    
-
+    import shop_sockets
     import connections
     import sockets
-    import user_handling
+
 
     return app
 if __name__ == "__main__":

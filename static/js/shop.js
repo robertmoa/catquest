@@ -6,7 +6,6 @@ const MYSTERY_BOX_NOTHING_CHANCE = 20;
 const MYSTERY_BOX_MIN_GOLD_REWARD = 50;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
-
 const shopSocket = io();
 
 function socketRequest(eventName, data = {}) {
@@ -16,7 +15,10 @@ function socketRequest(eventName, data = {}) {
         });
     });
 }
-
+async function loadItems() {
+    const items = await socketRequest("get_all_items");
+    return items;
+}
 async function loadUsername() {
     const data = await socketRequest("get_user_info");
 
@@ -237,6 +239,7 @@ function initializeShopTabs() {
     const swordGrid = document.getElementById("sword-shop-grid");
     const hatGrid = document.getElementById("hat-shop-grid");
     const tabButtons = document.querySelectorAll(".shop-tab-button");
+    
 
     if (!shopTitle || !shopSubtitle || !swordGrid || !hatGrid || tabButtons.length === 0) {
         return;
@@ -278,7 +281,8 @@ function initializeShopTabs() {
 // expand and collapse without leaving the shop page.
 function initializeInspectWeaponButtons() {
     const inspectButtons = document.querySelectorAll(".inspect-weapon-button");
-
+    console.log("these are the inspect buttons!")
+    console.log(inspectButtons);
     inspectButtons.forEach((button) => {
         button.addEventListener("click", () => {
             const detailsElement = button.nextElementSibling;
@@ -334,14 +338,50 @@ function initializeShopAddGoldButton() {
         }
 
     });
-}   
+}
+// For the swords and hats, we ask for all the items in the item database and depending on if they are a sword or a hat, we put them in the seperate categories
+async function initializeShopCards() {
+    const items = await loadItems();
+
+    const shopCardTemplate = document.getElementById("shop-card-template");
+    const swordGrid = document.getElementById("sword-shop-grid");
+    const hatGrid = document.getElementById("hat-shop-grid");
+
+    items.forEach(item => {
+        const card = shopCardTemplate.content.cloneNode(true);
+
+
+        card.querySelector(".buy-weapon-button").dataset.cost = String(item.cost);
+        card.querySelector(".buy-weapon-button").dataset.itemName = item.name;
+        card.querySelector('.card-image-top').src = item.imgpath;
+        card.querySelector('.card-title').textContent = item.name;
+        card.querySelector('.card-text.text-secondary.mb-4').textContent = `Price: ${item.cost}`;
+        card.querySelector(".small.text-secondary.mb-1").textContent = item.description;
+        const stat = card.querySelector(".small.fw-semibold.mb-0");
+
+
+        if (item.type === "sword") {
+            stat.textContent = `Damage: ${item.attack}`;
+            swordGrid.appendChild(card);
+        } 
+        else {
+            stat.textContent = `Defense: ${item.defense}`;
+            hatGrid.appendChild(card);
+        }
+
+    });
+}
 
 // Main page setup for the shop.
-function initializeShopPage() {
+async function initializeShopPage() {
     initializeShopGoldDisplay();
     initializeShopTabs();
+
+    await initializeShopCards();
+
     initializeShopButtons();
     initializeInspectWeaponButtons();
+
     initializeMysteryBoxButton();
     initializeShopAddGoldButton();
 }
