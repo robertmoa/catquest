@@ -3,12 +3,14 @@ from models import User
 from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
 from serverstuff import db, users, socketio
+from loginmgmt import handle_login
 main = Blueprint("main", __name__)
 
 
 @main.route("/", methods=["GET"])
 def login_page():
     return render_template("login.html")
+
 @main.route("/login", methods=["POST"])
 def login():
     username = request.form.get("username")
@@ -18,8 +20,7 @@ def login():
     user = db.session.execute(stmt).scalar_one_or_none()
 
     if user and check_password_hash(user.password, password):
-        session["username"] = username
-        print(session["username"])
+        handle_login(username)
         return redirect(url_for("main.home"))
     return render_template("login.html", error="Username/password is not correct")
 
@@ -36,7 +37,7 @@ def signup():
         new_user_entry = User(username=username,password=pw_hashed)
         db.session.add(new_user_entry)
         db.session.commit()
-        session["username"] = username
+        handle_login(username)
         return redirect(url_for("main.home"))
     print("user exists")
     return render_template("login.html", error="This username is taken!")

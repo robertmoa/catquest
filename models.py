@@ -142,3 +142,4 @@ class ChatHistory(db.Model):
     #as only some messages are /w messages, this will only be sometimes filled
     to_user: Mapped[str] = mapped_column(String(16),nullable=True,default=None)
     message: Mapped[str] = mapped_column(String(255))
+    message_type: Mapped[str] = mapped_column(String(16),default="global")

@@ -7,55 +7,89 @@ from sqlalchemy import select
 
 @socketio.on('chatmsg')
 def handle_chatmsg(msg):
-    msg['userid'] = session["username"]
-    #prints message -- CHANGE TO USERNAME WHEN LOGIN STUFF FINISHED
-    print(f"Received message from {session['username']}: {msg['txt']}")
-    #sets style to empty, so that a normal message will be non specific
-    msg['style'] = ''
-    #As we dont know if it is a whisper or not, this sets target_user to none at first
+    username = session.get("username")
+    text = msg.get("txt", "").strip()
+
+    if not text:
+        return
+
     target_user = None
-    
-    #case 1, empty message, do not emit
-    if msg['txt'] == '':
-        print("empty message, not broadcasting")
-        return
-    
+    msg_type = "global"
 
-    #case 2 whisper
-    if msg['txt'].startswith('/w '):
-        message = msg['txt'][3:].split(' ')
-        target_user = message[0]
-        if target_user not in users.values():
-            feedbackmsg = {
-            'userid': 'CatQuest',
-            'txt': "Player not found, make sure you have the correct username and that they are online.",
-            'style': 'text-danger fst-italic'
-            }
-            emit('chatmsg', feedbackmsg, room=msg['userid'])
+    # --- WHISPER ---
+    if text.startswith('/w '):
+        parts = text[3:].split(' ', 1)
+
+        if len(parts) < 2:
+            emit('chatmsg', {
+                "type": "system",
+                "text": "Invalid whisper format. Use /w username message"
+            }, room=username)
             return
-            
-        msg['txt'] = ' '.join(message[1:])
-        msg['style'] = 'text-muted fst-italic'
 
-        feedbackmsg = msg.copy()
-        feedbackmsg['userid'] = f"to {target_user}"
-        emit('chatmsg', msg, room=target_user)
-        emit('chatmsg', feedbackmsg, room=msg['userid'])
-        return
-    
+        target_user, text = parts
 
-    #regular message
+        if target_user not in users.keys():
+            emit('chatmsg', {
+                "type": "system",
+                "text": "Player not found."
+            }, room=username)
+            return
+
+        msg_type = "pm"
+
+        payload = {
+            "type": "pm",
+            "from": username,
+            "to": target_user,
+            "text": text
+        }
+
+        emit('chatmsg', payload, room=target_user)
+        emit('chatmsg', payload, room=username)
+
+    # --- GLOBAL ---
     else:
-        emit('chatmsg', msg, broadcast=True)
-    
-    #At the end, add it to chat history table
-    new_chat = ChatHistory(from_user=session["username"],to_user=target_user,message=msg['txt'])
+        payload = {
+            "type": "global",
+            "from": username,
+            "text": text
+        }
+
+        emit('chatmsg', payload, broadcast=True)
+
+    # --- SAVE ---
+    new_chat = ChatHistory(
+        from_user=username,
+        to_user=target_user,
+        message=text,
+        #message_type=msg_type
+    )
     db.session.add(new_chat)
     db.session.commit()
-    return
 
-
-
+@socketio.on("get_my_chat_history")
+def get_msgs(data):
+    username = session["username"]
+    messages = db.session.execute(
+    db.select(ChatHistory)
+    .where(ChatHistory.id > session["latest_msgid"])
+    ).scalars().all()
+    payload = []
+    for msg in messages:
+        if msg.message_type == "pm":
+            if msg.from_user != username and msg.to_user != username:
+                continue
+        
+        payload.append({
+        "id": msg.id,
+        "from": msg.from_user,
+        "to": msg.to_user,
+        "text": msg.message,
+        "type": msg.message_type,
+        })
+        
+    return payload
 
 @socketio.on("get_user_stats")
 def get_user_stats(data=None):
