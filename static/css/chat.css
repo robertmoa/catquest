@@ -35,6 +35,11 @@
   overflow-y: auto;
   padding-left: 5px;
   padding-right: 5px;
+  width: 28vw;
+  overflow-y: auto;        /* vertical scroll when needed */
+  overflow-x: hidden;      /* prevent horizontal scrolling */
+  word-wrap: break-word;   /* wrap long words */
+  overflow-wrap: break-word; /* modern version */
 }
 /* Navbar wrapper */
 .nav-wrapper {
