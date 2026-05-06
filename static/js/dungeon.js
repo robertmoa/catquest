@@ -84,15 +84,21 @@ const player = {
   hatBonus: 0,       // from currently equipped hat
   // levelDefenceBonus is computed in the totalDefence getter
 
-  // Stamina (unlocks at level 10)
   currentStamina: 0,
 
-  // Crit chance (% — 0 by default; raised by shop potions later)
-  critChance: 0,
+  status: {
+    stunned: 0,
+    slowed: 0,
+    staggered: 0,
+    dot: 0,
+    dotDamage: 0,
+    charging: 0,
+  },
 
   // Skill ids the player owns. Core actions (attack/defend/heal/flee)
   // are always available so they aren't stored here.
-  ownedSkills: [],
+  ownedSkills: ["stagger"],
+  cooldowns: {},
 
   // Turn buff: defence multiplier active for the next enemy attack.
   // Set by Defend / Guard, consumed in enemyAttackPlayer.
@@ -107,12 +113,15 @@ const player = {
   },
 
   get maxStamina() {
-    if (this.level < 10) return 0;
-    return 5 + (this.level - 10) * 3;
+    return 3 + Math.floor(this.level / 2);
   },
 
   get hasStamina() {
-    return this.level >= 10;
+    return true;
+  },
+
+  get critChance() {
+    return Math.min(60, Math.floor(this.level / 5) * 5);
   }
 };
 
@@ -151,8 +160,13 @@ const ACTIONS = {
   },
   shield_break: {
     id: "shield_break", name: "Shield Break",
-    type: "attack", staminaCost: 3, damageMult: 1.5,
+    type: "shield_break", staminaCost: 3, damageMult: 1.5, defReduction: 0.7,
     levelReq: 8, isCore: false,
+  },
+  stagger: {
+    id: "stagger", name: "Stagger",
+    type: "stagger", staminaCost: 1, damageMult: 0.5,
+    levelReq: 1, isCore: false,
   },
 };
 
@@ -190,12 +204,17 @@ function createEnemy(enemyNumber) {
   var goldDrop = 5 + Math.floor(enemyNumber * 1.5);
   var xpDrop = 20 + enemyNumber * 3;
 
+  var entrymsg = template.entrymsg;
+  var imgpath = template.imgpath;
+
   if (isBoss) {
     hp = Math.floor(hp * 3);
     attack = Math.floor(attack * 1.5);
     defence = Math.floor(defence * 1.5);
     goldDrop *= 5;
     xpDrop *= 3;
+    entrymsg = "Boss #" + enemyNumber + " emerges from the darkness... prepare yourself!";
+    imgpath = "/static/images/ecatsprite.png"; // TODO: swap for a dedicated boss sprite
   } else {
     var variant = pickVariant();
     hp = Math.max(1, Math.floor(hp * variant.hpMult));
@@ -206,13 +225,13 @@ function createEnemy(enemyNumber) {
   // Build the name — boss prefix overrides template name
   var displayName = isBoss
     ? "Boss - " + template.name + " #" + enemyNumber
-    : template.name + " #" + enemyNumber + (isBoss ? "" : "");
+    : template.name + " #" + enemyNumber + variant.suffix;
 
   return {
     name: displayName,
-    entrymsg: template.entrymsg,
+    entrymsg: entrymsg,
     description: template.description,
-    imgpath: template.imgpath,
+    imgpath: imgpath,
     currentHp: hp,
     maxHp: hp,
     attack: attack,
@@ -221,6 +240,18 @@ function createEnemy(enemyNumber) {
     xpDrop: xpDrop,
     enemyNumber: enemyNumber,
     isBoss: isBoss,
+    specialType: template.special_type || null,
+    defReduced: false,
+    defReduceTurns: 0,
+    status: {
+      stunned: 0,
+      slowed: 0,
+      staggered: 0,
+      dot: 0,
+      dotDamage: 0,
+      charging: 0,
+      chargePayload: 0,
+    },
   };
 }
 
@@ -228,7 +259,9 @@ function createEnemy(enemyNumber) {
 let enemy = null;
 let battleLocked = false;
 let dungeonGoldEarned = 0;
+let usedStaminaThisTurn = false;
 let selectedActionIndex = 0;
+let comboCount = 0;
 
 const playerHpFill = document.getElementById("player-hp-fill");
 const playerHpText = document.getElementById("player-hp-text");
@@ -274,15 +307,13 @@ function updatePlayerStatsUI() {
   if (defenceEl) defenceEl.textContent = player.totalDefence;
   if (enemyCountEl) enemyCountEl.textContent = player.enemyCount;
 
-  // Stamina row hidden until level 10
+  var critEl = document.getElementById("player-crit");
+  if (critEl) critEl.textContent = player.critChance + "%";
+
   if (staminaRow) {
-    if (player.hasStamina) {
-      staminaRow.style.display = "";
-      if (staminaEl) {
-        staminaEl.textContent = `${player.currentStamina} / ${player.maxStamina}`;
-      }
-    } else {
-      staminaRow.style.display = "none";
+    staminaRow.style.display = "";
+    if (staminaEl) {
+      staminaEl.textContent = `${player.currentStamina} / ${player.maxStamina}`;
     }
   }
 }
@@ -293,9 +324,39 @@ function updateEnemyUI() {
   updateHpUI(enemy, enemyHpFill, enemyHpText);
 }
 
+function renderStatusDisplay(unit, elementId) {
+  var el = document.getElementById(elementId);
+  if (!el) return;
+  var parts = [];
+  if (unit.status.stunned > 0)    parts.push("Stunned (" + unit.status.stunned + ")");
+  if (unit.status.slowed > 0)     parts.push("Slowed (" + unit.status.slowed + ")");
+  if (unit.status.staggered > 0)  parts.push("Staggered (" + unit.status.staggered + ")");
+  if (unit.status.charging > 0)   parts.push("Charging... (" + unit.status.charging + ")");
+  if (unit.status.dot > 0)        parts.push("Burning (" + unit.status.dot + "t, " + unit.status.dotDamage + "dmg)");
+  el.textContent = parts.join(" | ");
+}
+
+// DoT HOOK: to apply DoT to any unit, set unit.status.dot = turns and unit.status.dotDamage = dmg.
+// tickStatus() will fire it automatically before that unit's turn each round.
+function tickStatus(unit) {
+  if (unit.status.dot > 0) {
+    applyDamage(unit, unit.status.dotDamage);
+    logAction(unit.name + " takes " + unit.status.dotDamage + " burn damage!");
+    unit.status.dot -= 1;
+    if (unit.status.dot === 0) {
+      unit.status.dotDamage = 0;
+      logAction(unit.name + "'s burn fades.");
+    }
+  }
+  // staggered decrements here; stunned/slowed are decremented at their point of use
+  if (unit.status.staggered > 0) unit.status.staggered -= 1;
+}
+
 function updateBattleUI() {
   updatePlayerStatsUI();
   updateEnemyUI();
+  renderStatusDisplay(player, "player-status-display");
+  if (enemy) renderStatusDisplay(enemy, "enemy-status-display");
 }
 
 function applyDamage(unit, amount) {
@@ -314,6 +375,7 @@ function logAction(message) {
   entry.classList.add("battle-log-entry");
   entry.textContent = message;
   logBox.appendChild(entry);
+  while (logBox.children.length > 50) { logBox.firstChild.remove(); }
   logBox.scrollTop = logBox.scrollHeight;
 }
 
@@ -322,17 +384,10 @@ function logAction(message) {
 function levelUp() {
   player.level += 1;
   player.maxHp += 10;
-  // currentHp not auto-restored; matches original behaviour
+  player.currentStamina = player.maxStamina;
 
   logAction(`Level Up! You are now level ${player.level}. Max HP increased to ${player.maxHp}.`);
-
-  // Unlock stamina + Double Scratch the moment level 5 is reached
-  if (player.level === 8 && !player.ownedSkills.includes("double_scratch")) {
-    player.ownedSkills.push("double_scratch");
-    player.currentStamina = player.maxStamina;
-    logAction("You feel a new energy! Stamina unlocked. Learned: Double Scratch!");
-    rebuildActionButtons();
-  }
+  logAction("Stamina fully restored.");
 
   savePlayerStats();
   saveProgressToServer();
@@ -365,29 +420,89 @@ function rollCrit(damage) {
 function playerAttack(damageMult, actionName) {
   let raw = player.totalAttack * damageMult;
   raw = rollCrit(raw);
-  const damage = Math.max(1, Math.floor(raw - enemy.defence));
+  const effectiveDefence = enemy.defReduced ? Math.floor(enemy.defence * 0.3) : enemy.defence;
+  const comboBonus = comboCount >= 2 ? comboCount : 0;
+  const damage = Math.max(1, Math.floor(raw - effectiveDefence) + comboBonus);
   applyDamage(enemy, damage);
   updateHpUI(enemy, enemyHpFill, enemyHpText);
   logAction(`${actionName} hits for ${damage} damage!`);
 }
 
 function enemyAttackPlayer() {
-  if (enemy.currentHp > 0) {
-    let defence = player.totalDefence;
-    if (player.defenceMultActive) {
-      defence = Math.floor(defence * player.defenceMultActive);
-    }
-    const damage = Math.max(1, enemy.attack - defence);
-    applyDamage(player, damage);
-    updateHpUI(player, playerHpFill, playerHpText);
-    logAction(`${enemy.name} attacks for ${damage} damage!`);
+  if (enemy.currentHp <= 0) return;
+
+  // Tick enemy status (DoT, staggered)
+  tickStatus(enemy);
+  updateHpUI(enemy, enemyHpFill, enemyHpText);
+  renderStatusDisplay(enemy, "enemy-status-display");
+
+  // Stun: enemy loses this turn
+  if (enemy.status.stunned > 0) {
+    enemy.status.stunned--;
+    logAction(enemy.name + " is stunned and cannot act!");
+    player.defenceMultActive = 0;
+    return;
   }
-  // consume buff after the enemy turn finishes
+
+  // Sorcerer special: charge on turn 1, release on turn 2
+  if (enemy.specialType === "sorcerer") {
+    if (enemy.status.charging === 0) {
+      enemy.status.charging = 1;
+      enemy.status.chargePayload = Math.floor(5 + player.level * 2);
+      logAction("Sorcerer Cat is channelling a spell... (use Stagger to interrupt!)");
+      renderStatusDisplay(enemy, "enemy-status-display");
+      player.defenceMultActive = 0;
+      return;
+    } else if (enemy.status.charging > 0) {
+      var spellDamage = enemy.status.chargePayload;
+      player.currentHp = Math.max(0, player.currentHp - spellDamage);
+      updateHpUI(player, playerHpFill, playerHpText);
+      logAction("Sorcerer Cat unleashes arcane fire! " + spellDamage + " true damage!");
+      enemy.status.charging = 0;
+      enemy.status.chargePayload = 0;
+      renderStatusDisplay(enemy, "enemy-status-display");
+      comboCount = 0;
+      player.defenceMultActive = 0;
+      return;
+    }
+  }
+
+  // Normal attack
+  let defence = player.totalDefence;
+  if (player.defenceMultActive) {
+    defence = Math.floor(defence * player.defenceMultActive);
+  }
+  const damage = Math.max(1, enemy.attack - defence);
+  applyDamage(player, damage);
+  comboCount = 0;
+  updateHpUI(player, playerHpFill, playerHpText);
+  logAction(`${enemy.name} attacks for ${damage} damage!`);
+
+  // Tick Shield Break duration
+  if (enemy.defReduced) {
+    enemy.defReduceTurns--;
+    if (enemy.defReduceTurns <= 0) {
+      enemy.defReduced = false;
+      logAction("Enemy defence restored.");
+    }
+  }
+
+  // Boss: 5% chance to stun player after a successful hit
+  if (enemy.isBoss && Math.random() < 0.05) {
+    player.status.stunned = 1;
+    logAction(enemy.name + " stuns you! You'll lose your next turn.");
+    renderStatusDisplay(player, "player-status-display");
+  }
+
+  // Consume buff
   player.defenceMultActive = 0;
 }
 
 function regenStamina() {
-  if (!player.hasStamina) return;
+  if (usedStaminaThisTurn) {
+    usedStaminaThisTurn = false;
+    return;
+  }
   player.currentStamina = Math.min(player.maxStamina, player.currentStamina + 1);
 }
 
@@ -466,6 +581,15 @@ function handleFlee() {
 }
 
 
+function tickCooldowns() {
+  for (const id in player.cooldowns) {
+    player.cooldowns[id]--;
+    if (player.cooldowns[id] <= 0) delete player.cooldowns[id];
+  }
+  rebuildActionButtons();
+}
+
+
 // --- Action dispatcher ---
 // Single entry point for any button. Reads ACTIONS[id] and runs it.
 function executeAction(actionId) {
@@ -483,23 +607,62 @@ function executeAction(actionId) {
 
   if (battleLocked || player.currentHp <= 0) return;
 
+  // Tick player status (DoT, staggered)
+  tickStatus(player);
+  updateHpUI(player, playerHpFill, playerHpText);
+  renderStatusDisplay(player, "player-status-display");
+
+  // If DoT killed the player, handle death and bail
+  if (player.currentHp <= 0) {
+    handlePlayerDeath();
+    updatePlayerStatsUI();
+    return;
+  }
+
+  // Stun: lose this turn but enemy still acts
+  if (player.status.stunned > 0) {
+    player.status.stunned--;
+    logAction("You are stunned and cannot act!");
+    battleLocked = true;
+    setTimeout(() => {
+      enemyAttackPlayer();
+      if (player.currentHp <= 0) handlePlayerDeath();
+      updateBattleUI();
+      battleLocked = false;
+    }, 500);
+    return;
+  }
+
+  // Cooldown check (non-core skills only)
+  if (!action.isCore && player.cooldowns[actionId] > 0) {
+    logAction(`${action.name} is on cooldown (${player.cooldowns[actionId]} turns)!`);
+    return;
+  }
+
   // Stamina cost check + spend
   if (action.staminaCost > 0) {
-    if (!player.hasStamina) {
-      logAction("You haven't unlocked stamina yet!");
-      return;
-    }
     if (player.currentStamina < action.staminaCost) {
       logAction("Not enough stamina!");
       return;
     }
     player.currentStamina -= action.staminaCost;
+    usedStaminaThisTurn = true;
   }
 
   runActionEffect(action);
 
-  // Enemy died from this action — skip enemy turn
+  // Set cooldown for non-core skills
+  if (!action.isCore) {
+    player.cooldowns[action.id] = 2;
+    rebuildActionButtons();
+  }
+
+  // Enemy died from this action — build combo, skip enemy turn
   if (enemy.currentHp <= 0) {
+    if (action.type === "attack" || action.type === "shield_break") {
+      comboCount++;
+      if (comboCount >= 2) logAction(`x${comboCount} Combo!`);
+    }
     handleEnemyDefeat();
     updatePlayerStatsUI();
     return;
@@ -513,6 +676,7 @@ function executeAction(actionId) {
       handlePlayerDeath();
     } else {
       regenStamina();
+      tickCooldowns();
     }
     updatePlayerStatsUI();
     battleLocked = false;
@@ -523,7 +687,13 @@ function executeAction(actionId) {
 
 function runActionEffect(action) {
   if (action.type === "attack") {
-    playerAttack(action.damageMult, action.name);
+    var effectiveMult = action.damageMult;
+    if (player.status.slowed > 0) {
+      player.status.slowed--;
+      effectiveMult *= 0.5;
+      logAction("You are slowed! Attack weakened.");
+    }
+    playerAttack(effectiveMult, action.name);
 
   } else if (action.type === "buff") {
     // Set defence multiplier for the next enemy attack
@@ -540,6 +710,37 @@ function runActionEffect(action) {
     healUnit(player, action.healFlat);
     updateHpUI(player, playerHpFill, playerHpText);
     logAction(`You heal for ${action.healFlat} HP!`);
+
+  } else if (action.type === "shield_break") {
+    const damage = Math.max(1, Math.floor(player.totalAttack * action.damageMult));
+    applyDamage(enemy, damage);
+    updateHpUI(enemy, enemyHpFill, enemyHpText);
+    enemy.defReduced = true;
+    enemy.defReduceTurns = 4;
+    logAction(`Shield Break! Enemy defence reduced by 70% for 4 turns!`);
+    logAction(`${action.name} hits for ${damage} damage!`);
+
+  } else if (action.type === "stagger") {
+    // If enemy is charging, cancel it and stun them instead
+    if (enemy.status.charging > 0) {
+      enemy.status.charging = 0;
+      enemy.status.chargePayload = 0;
+      enemy.status.stunned = 1;
+      logAction("Stagger interrupts the charge! Enemy is stunned!");
+      renderStatusDisplay(enemy, "enemy-status-display");
+      return;
+    }
+    // Normal stagger: half damage + apply staggered to enemy
+    var effectiveMult = action.damageMult;
+    if (player.status.slowed > 0) {
+      player.status.slowed--;
+      effectiveMult *= 0.5;
+      logAction("You are slowed! Attack weakened.");
+    }
+    playerAttack(effectiveMult, action.name);
+    enemy.status.staggered = 1;
+    logAction("Enemy is staggered!");
+    renderStatusDisplay(enemy, "enemy-status-display");
   }
 }
 
@@ -559,9 +760,11 @@ function getAvailableActions() {
 }
 
 function getButtonClass(action) {
-  if (action.type === "attack") return "btn-outline-danger";
-  if (action.type === "heal")   return "btn-outline-success";
-  if (action.type === "buff")   return "btn-outline-warning";
+  if (action.type === "attack")       return "btn-outline-danger";
+  if (action.type === "shield_break") return "btn-outline-danger";
+  if (action.type === "stagger")      return "btn-outline-info";
+  if (action.type === "heal")         return "btn-outline-success";
+  if (action.type === "buff")         return "btn-outline-warning";
   return "btn-outline-secondary";
 }
 
@@ -578,9 +781,9 @@ function rebuildActionButtons() {
     btn.dataset.index = String(index);
     btn.type = "button";
 
-    // Show stamina cost in label when relevant, e.g. "Double Scratch (2)"
     let label = action.name;
     if (action.staminaCost > 0) label += ` (${action.staminaCost})`;
+    if (player.cooldowns[action.id] > 0) label += ` [CD:${player.cooldowns[action.id]}]`;
     btn.textContent = label;
 
     btn.addEventListener("click", () => executeAction(action.id));
@@ -643,11 +846,12 @@ function loadPlayerStats() {
   player.attackBonus = Number(localStorage.getItem("catquest_player_max_attack")) || 0;
   player.weaponBonus = Number(localStorage.getItem("catquest_player_weapon_bonus")) || 0;
   player.hatBonus = Number(localStorage.getItem("catquest_player_hat_bonus")) || 0;
-  player.critChance = Number(localStorage.getItem("catquest_player_crit_chance")) || 0;
-  player.currentStamina = Number(localStorage.getItem("catquest_player_current_stamina")) || 0;
+  const savedStamina = localStorage.getItem("catquest_player_current_stamina");
+  player.currentStamina = savedStamina !== null ? Number(savedStamina) : player.maxStamina;
 
   const ownedRaw = localStorage.getItem("catquest_player_owned_skills");
   player.ownedSkills = ownedRaw ? JSON.parse(ownedRaw) : [];
+  if (!player.ownedSkills.includes("stagger")) player.ownedSkills.push("stagger");
 
   // maxHp grows by 10 per level above 1; rebuild on load
   const savedMaxHp = Number(localStorage.getItem("catquest_player_max_hp"));
@@ -662,7 +866,6 @@ function savePlayerStats() {
   localStorage.setItem("catquest_player_max_attack", String(player.attackBonus));
   localStorage.setItem("catquest_player_weapon_bonus", String(player.weaponBonus));
   localStorage.setItem("catquest_player_hat_bonus", String(player.hatBonus));
-  localStorage.setItem("catquest_player_crit_chance", String(player.critChance));
   localStorage.setItem("catquest_player_current_stamina", String(player.currentStamina));
   localStorage.setItem("catquest_player_owned_skills", JSON.stringify(player.ownedSkills));
   localStorage.setItem("catquest_player_max_hp", String(player.maxHp));
@@ -707,12 +910,6 @@ window.unlockSkill = function (skillId) {
   }
 };
 
-// Crit potion: increase crit chance by amount percentage points
-window.increaseCritChance = function (amount) {
-  player.critChance += amount;
-  savePlayerStats();
-};
-
 async function updateGoldDisplay() {
   var gold = await window.getPlayerGold();
   var goldEl = document.getElementById("player-gold");
@@ -736,6 +933,21 @@ if (dungeonSocket) {
   });
 }
 
-window.addEventListener("beforeunload", function () {
+window.addEventListener("beforeunload", function(e) {
   saveProgressToServer();
+  if (dungeonGoldEarned > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+document.querySelectorAll(".nav-link").forEach(function(link) {
+  link.addEventListener("click", function(e) {
+    if (dungeonGoldEarned > 0) {
+      var confirmed = confirm("Are you sure you want to quit the dungeon instead of fleeing? Quitting this way will lose all gold gained this hunt! (Your XP and level are safe.)");
+      if (!confirmed) {
+        e.preventDefault();
+      }
+    }
+  });
 });

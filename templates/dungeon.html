@@ -41,6 +41,7 @@
                         <div class="hp-bar-bg" aria-hidden="true">
                             <div id="player-hp-fill" class="hp-bar-fill"></div>
                         </div>
+                        <div id="player-status-display" style="min-height: 20px; font-size: 0.8em; color: gold;"></div>
 
                         <div class="stats-row" style="margin-top: 8px;">
                             <span class="stat-label">Gold</span>
@@ -67,7 +68,11 @@
                             <span class="stat-label">Defence</span>
                             <span id="player-defence" class="stat-value">0</span>
                         </div>
-                        <div class="stats-row" id="stamina-row" style="display: none;">
+                        <div class="stats-row" id="crit-row">
+                            <span class="stat-label">Crit Rate</span>
+                            <span id="player-crit" class="stat-value">0%</span>
+                        </div>
+                        <div class="stats-row" id="stamina-row">
                             <span class="stat-label">Stamina</span>
                             <span id="player-stamina" class="stat-value">0 / 0</span>
                         </div>
@@ -86,6 +91,7 @@
 
                 <section id="enemy-unit" class="battle-unit" aria-label="Enemy">
                     <div id="enemy-hud" class="unit-panel">
+                        <div id="enemy-status-display" style="min-height: 20px; font-size: 0.8em; color: gold; text-align: center;"></div>
                         <div class="hp-row">
                             <span class="hp-label" id="enemy-name">Angry Cat #1</span>
                             <span id="enemy-hp-text" class="hp-text">20 / 20</span>

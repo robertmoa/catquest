@@ -48,6 +48,7 @@ def handle_get_monsters(data=None):
             "max_hp": m.max_hp,
             "damage": m.damage,
             "reward": m.reward,
+            "special_type": m.special_type,
         }
         for m in monsters
     ]
@@ -83,6 +84,16 @@ MONSTER_DATA = [
         "max_hp": 50,
         "damage": 12,
         "reward": 40,
+    },
+    {
+        "name": "Sorcerer Cat",
+        "description": "A cat that has studied forbidden arcane arts.",
+        "imgpath": "/static/images/ecatsprite.png",  # swap if a sorcerer sprite exists
+        "entrymsg": "A Sorcerer Cat appears, eyes glowing. It begins to chant...",
+        "max_hp": 45,
+        "damage": 6,
+        "reward": 35,
+        "special_type": "sorcerer",
     },
 ]
 
