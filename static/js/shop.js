@@ -104,6 +104,18 @@ async function renderShopGold() {
     updateShopGoldDisplay(await getPlayerGold());
 }
 
+function markItemPurchased(button) {
+    if (!button) {
+        return;
+    }
+
+    button.textContent = "Purchased";
+    button.disabled = true;
+    button.classList.remove("btn-primary", "btn-outline-primary");
+    button.classList.add("btn-success");
+    button.setAttribute("aria-disabled", "true");
+}
+
 // Builds the confirmation prompt list for a normal shop purchase.
 // Most items use one prompt, while a couple have custom jokes and the uncertainty sword
 // intentionally makes the player click through several confirmations.
@@ -133,7 +145,20 @@ function getPurchaseConfirmationPrompts(cost, itemName) {
 }
 
 // Handles buying one of the normal shop items.
-async function buyShopItem(cost, itemName, item_id) {
+async function buyShopItem(cost, itemName, item_id, button) {
+    if (button && button.disabled) {
+        return false;
+    }
+
+    if (button && button.dataset.purchasePending === "true") {
+        return false;
+    }
+
+    if (await checkOwns(item_id)) {
+        markItemPurchased(button);
+        return false;
+    }
+
     const confirmationPrompts = getPurchaseConfirmationPrompts(cost, itemName);
 
     for (const promptMessage of confirmationPrompts) {
@@ -144,26 +169,38 @@ async function buyShopItem(cost, itemName, item_id) {
         }
     }
 
-    if (await checkOwns(item_id)) {
-        window.alert("You already own this item");
+    if (button) {
+        button.dataset.purchasePending = "true";
+    }
+
+    const data = await socketRequest("buy_item", { item_id: item_id });
+
+    if (button) {
+        delete button.dataset.purchasePending;
+    }
+
+    if (!data.success) {
+        if (data.gold !== undefined) {
+            updateShopGoldDisplay(data.gold);
+        }
+
+        if (data.owned) {
+            markItemPurchased(button);
+            return false;
+        }
+
+        if (data.error === "Not enough gold") {
+            window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
+            return false;
+        }
+
+        window.alert(data.error || "Purchase failed on server.");
         return false;
     }
 
-    const wasPurchased = await spendPlayerGold(cost);
-
-    if (!wasPurchased) {
-        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
-        return false;
-    }
-
-    const itemAdded = await owns(item_id);
-
-    if (!itemAdded) {
-        window.alert("Purchase failed on server. Gold may still have been deducted.");
-        return false;
-    }
-
-    window.alert("Purchased " + itemName + " for " + cost + " gold.");
+    updateShopGoldDisplay(data.gold);
+    markItemPurchased(button);
+    window.alert("Purchased " + itemName + " for " + data.cost + " gold.");
     return true;
 }
 
@@ -250,11 +287,11 @@ function initializeShopButtons() {
     const buyButtons = document.querySelectorAll(".buy-weapon-button");
 
     buyButtons.forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             const cost = Number(button.dataset.cost);
             const itemName = button.dataset.itemName || "item";
             const itemId = button.dataset.itemId;
-            buyShopItem(cost, itemName, itemId);
+            await buyShopItem(cost, itemName, itemId, button);
         });
     });
 }
@@ -376,11 +413,14 @@ async function initializeShopCards() {
 
     items.forEach(item => {
         const card = shopCardTemplate.content.cloneNode(true);
+        const buyButton = card.querySelector(".buy-weapon-button");
 
-
-        card.querySelector(".buy-weapon-button").dataset.cost = String(item.cost);
-        card.querySelector(".buy-weapon-button").dataset.itemName = item.name;
-        card.querySelector(".buy-weapon-button").dataset.itemId = String(item.id);
+        buyButton.dataset.cost = String(item.cost);
+        buyButton.dataset.itemName = item.name;
+        buyButton.dataset.itemId = String(item.id);
+        if (item.owned) {
+            markItemPurchased(buyButton);
+        }
         card.querySelector('.card-image-top').src = item.imgpath;
         card.querySelector('.card-title').textContent = item.name;
         card.querySelector('.card-text.text-secondary.mb-4').textContent = `Price: ${item.cost}`;

@@ -30,6 +30,8 @@ class UserStat(db.Model):
     #dungeon
     xp: Mapped[int] = mapped_column(default=0)
     level: Mapped[int] = mapped_column(default=0)
+    equipped_weapon: Mapped[int] = mapped_column(ForeignKey("item.id"),nullable=True,default=None)
+    equipped_armour: Mapped[int] = mapped_column(ForeignKey("item.id"),nullable=True,default=None)
     user: Mapped["User"] = relationship(back_populates="data")
 
 

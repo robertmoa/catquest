@@ -5,10 +5,72 @@ from serverstuff import db, socketio
 
 shop = Blueprint("shop", __name__, url_prefix="/shop")
 
+def ensure_user_stat(user):
+    if user.data is None:
+        user.data = UserStat(gold=0, xp=0, level=0)
+
+    return user.data
+
+
+def get_item_id(data):
+    data = data or {}
+    item_id = data.get("item_id")
+
+    if item_id is None:
+        return None
+
+    try:
+        return int(item_id)
+    except (TypeError, ValueError):
+        return None
+
+
+def check_user_owns_item(user, item_id):
+    existing = db.session.execute(
+        select(UserItem.id).where(
+            UserItem.user_id == user.id,
+            UserItem.item_id == item_id
+        ).limit(1)
+    ).first()
+
+    return existing is not None
+
+
+def equip_item(user, item):
+    user_stats = ensure_user_stat(user)
+
+    if item.itype == "sword":
+        user_stats.equipped_weapon = item.id
+    elif item.itype in ("armour", "armor", "hat"):
+        user_stats.equipped_armour = item.id
+
+    return user_stats
+
+
 @socketio.on("get_all_items")
 def handle_getting_items(data):
     all_items = Item.query.all()
-    payload = [item.to_dict() for item in all_items]
+    username = session.get("username")
+    owned_item_ids = set()
+
+    if username is not None:
+        user = db.session.execute(
+            select(User).where(User.username == username)
+        ).scalar_one_or_none()
+
+        if user is not None:
+            owned_item_ids = {
+                user_item.item_id
+                for user_item in user.items
+            }
+
+    payload = []
+
+    for item in all_items:
+        item_data = item.to_dict()
+        item_data["owned"] = item.id in owned_item_ids
+        payload.append(item_data)
+
     print(payload)
     return payload
 
@@ -40,8 +102,76 @@ def handle_add_gold(data):
     }
 
 
-@socketio.on("spend_gold")
 @socketio.on("buy_item")
+def buy_item(data):
+    username = session.get("username")
+
+    if username is None:
+        return {"success": False, "error": "Not logged in"}
+
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    if user is None:
+        return {"success": False, "error": "User not found"}
+
+    user_stats = ensure_user_stat(user)
+    item_id = get_item_id(data)
+
+    if item_id is None:
+        return {"success": False, "error": "Missing item_id", "gold": user_stats.gold}
+
+    item = db.session.execute(
+        select(Item).where(Item.id == item_id)
+    ).scalar_one_or_none()
+
+    if item is None:
+        return {"success": False, "error": "Item not found", "gold": user_stats.gold}
+
+    if check_user_owns_item(user, item.id):
+        return {
+            "success": False,
+            "owned": True,
+            "gold": user_stats.gold,
+            "item_id": item.id,
+            "item_type": item.itype,
+            "equipped_weapon": user_stats.equipped_weapon,
+            "equipped_armour": user_stats.equipped_armour,
+        }
+
+    if user_stats.gold < item.cost:
+        return {
+            "success": False,
+            "error": "Not enough gold",
+            "gold": user_stats.gold,
+            "item_id": item.id,
+            "item_type": item.itype,
+        }
+
+    user_stats.gold -= item.cost
+    user_item = UserItem(
+        user_id=user.id,
+        item_id=item.id
+    )
+
+    db.session.add(user_item)
+    equip_item(user, item)
+    db.session.commit()
+
+    return {
+        "success": True,
+        "owned": True,
+        "gold": user_stats.gold,
+        "item_id": item.id,
+        "item_type": item.itype,
+        "cost": item.cost,
+        "equipped_weapon": user_stats.equipped_weapon,
+        "equipped_armour": user_stats.equipped_armour,
+    }
+
+
+@socketio.on("spend_gold")
 def handle_spend_gold(data):
     username = session.get("username")
 
@@ -55,8 +185,7 @@ def handle_spend_gold(data):
     if user is None:
         return {"success": False, "error": "User not found"}
 
-    if user.data is None:
-        user.data = UserStat(gold=0, xp=0, level=0)
+    ensure_user_stat(user)
     
     data = data or {}
     cost = data.get("cost")
@@ -89,21 +218,14 @@ def own_item(data):
     if user is None:
         return {"success": False, "error": "User not found"}
 
-    data = data or {}
-    item_id = data.get("item_id")
+    ensure_user_stat(user)
+    item_id = get_item_id(data)
 
     if item_id is None:
         return {"success": False, "error": "Missing item_id"}
 
-    existing = db.session.execute(
-        select(UserItem).where(
-            UserItem.user_id == user.id,
-            UserItem.item_id == item_id
-        )
-    ).scalar_one_or_none()
-
-    if existing is not None:
-        return {"success": False, "error": "User already owns this item"}
+    if check_user_owns_item(user, item_id):
+        return {"success": False, "owned": True, "error": "User already owns this item"}
 
 
     item = db.session.execute(
@@ -120,9 +242,16 @@ def own_item(data):
     )
 
     db.session.add(user_item)
+    equip_item(user, item)
     db.session.commit()
 
-    return {"success": True}
+    return {
+        "success": True,
+        "item_id": item.id,
+        "item_type": item.itype,
+        "equipped_weapon": user.data.equipped_weapon,
+        "equipped_armour": user.data.equipped_armour,
+    }
 
 
 @socketio.on("check_own_item")
@@ -139,20 +268,12 @@ def check_own_item(data):
     if user is None:
         return {"owns": False}
 
-    data = data or {}
-    item_id = data.get("item_id")
+    item_id = get_item_id(data)
 
     if item_id is None:
         return {"owns": False}
 
-    existing = db.session.execute(
-        select(UserItem).where(
-            UserItem.user_id == user.id,
-            UserItem.item_id == item_id
-        )
-    ).scalar_one_or_none()
-
-    return {"owns": existing is not None}
+    return {"owns": check_user_owns_item(user, item_id)}
 
 
 
