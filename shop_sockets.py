@@ -322,7 +322,7 @@ SWORD_DATA = [
         "cost": 15,
         "description": "I assure you, it is above average size and very funny.",
         "specialprompt": [
-            "I assure you, I am actually above average size AND I am really funny"
+            "I assure you, I am actually above average size AND I am really funny\n\nBuy An Above Average Sized Dagger for 15 gold?"
         ],
         "imgpath": "/static/images/Swords/An Above Average Sized Dagger.png",
         "attack": 7,
@@ -378,7 +378,7 @@ SWORD_DATA = [
         "cost": 100,
         "description": "Trust me, it is really strong wood.",
         "specialprompt": [
-            "Trust me, it's really strong wood"
+            "Trust me, it's really strong wood\n\nBuy Wooden Sword for 100 gold?"
         ],
         "imgpath": "/static/images/Swords/Wooden Sword.png",
         "attack": 38,

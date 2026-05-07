@@ -79,6 +79,7 @@ class Item(db.Model):
             "type": self.itype,
             "cost": self.cost,
             "description": self.description,
+            "specialprompt": self.specialprompt,
             "imgpath": self.imgpath,
         }
 

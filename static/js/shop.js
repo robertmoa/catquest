@@ -116,30 +116,25 @@ function markItemPurchased(button) {
     button.setAttribute("aria-disabled", "true");
 }
 
-// Builds the confirmation prompt list for a normal shop purchase.
-// Most items use one prompt, while a couple have custom jokes and the uncertainty sword
-// intentionally makes the player click through several confirmations.
-function getPurchaseConfirmationPrompts(cost, itemName) {
-    const customPromptsByItem = {
-        "An Above Average Sized Dagger": [
-            "I assure you, I am actually above average size AND I am really funny\n\nBuy An Above Average Sized Dagger for " + cost + " gold?"
-        ],
-        "Wooden Sword": [
-            "Trust me, it's really strong wood\n\nBuy Wooden Sword for " + cost + " gold?"
-        ]
-    };
-
-    if (itemName === "Sword of Uncertainty") {
-        return [
-            "Are you sure you want to purchase this sword",
-            "Youre 100% certain?",
-            "But are you really sure? Like deadset you know you want this",
-            "This is your fourth confirmation. You must really want this, right?",
-            "Last chance! Theres no going back now"
-        ];
+function getButtonSpecialPrompts(button) {
+    if (!button || !button.dataset.specialprompt) {
+        return [];
     }
 
-    return customPromptsByItem[itemName] || [
+    try {
+        return JSON.parse(button.dataset.specialprompt) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Builds the confirmation prompt list for a normal shop purchase.
+function getPurchaseConfirmationPrompts(cost, itemName, specialPrompts) {
+    if (Array.isArray(specialPrompts) && specialPrompts.length > 0) {
+        return specialPrompts;
+    }
+
+    return [
         "Are you sure you want to buy " + itemName + " for " + cost + " gold?"
     ];
 }
@@ -159,7 +154,11 @@ async function buyShopItem(cost, itemName, item_id, button) {
         return false;
     }
 
-    const confirmationPrompts = getPurchaseConfirmationPrompts(cost, itemName);
+    const confirmationPrompts = getPurchaseConfirmationPrompts(
+        cost,
+        itemName,
+        getButtonSpecialPrompts(button)
+    );
 
     for (const promptMessage of confirmationPrompts) {
         const confirmedPurchase = window.confirm(promptMessage);
@@ -418,6 +417,7 @@ async function initializeShopCards() {
         buyButton.dataset.cost = String(item.cost);
         buyButton.dataset.itemName = item.name;
         buyButton.dataset.itemId = String(item.id);
+        buyButton.dataset.specialprompt = JSON.stringify(item.specialprompt || []);
         if (item.owned) {
             markItemPurchased(buyButton);
         }
