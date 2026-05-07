@@ -47,6 +47,23 @@ def equip_item(user, item):
     return user_stats
 
 
+@socketio.on("get_item_specialprompt")
+def get_item_specialprompt(data):
+    item_id = get_item_id(data)
+
+    if item_id is None:
+        return {"specialprompt": []}
+
+    item = db.session.execute(
+        select(Item).where(Item.id == item_id)
+    ).scalar_one_or_none()
+
+    if item is None:
+        return {"specialprompt": []}
+
+    return {"specialprompt": item.specialprompt or []}
+
+
 @socketio.on("get_all_items")
 def handle_getting_items(data):
     all_items = Item.query.all()
@@ -312,7 +329,9 @@ SWORD_DATA = [
         "name": "Short Longsword",
         "cost": 5,
         "description": "The shortest longsword in all the realms.",
-        "specialprompt": None,
+        "specialprompt": [
+            "It may be short, but it has a long name.\n\nBuy Short Longsword for 5 gold?"
+        ],
         "imgpath": "/static/images/Swords/Short Longsword.png",
         "attack": 4,
         "crit_chance": 0.03,
@@ -341,7 +360,7 @@ SWORD_DATA = [
         "name": "Rapier of Death and Despair",
         "cost": 35,
         "description": "A dramatic blade for dramatic consequences.",
-        "specialprompt": None,
+        "specialprompt": ["A dramatic blade for dramatic consequences\n\nBuy Rapier of Death and Despair for 35 gold?"],
         "imgpath": "/static/images/Swords/Rapier of Death and Despair.png",
         "attack": 14,
         "crit_chance": 0.12,

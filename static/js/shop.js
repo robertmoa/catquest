@@ -128,10 +128,29 @@ function getButtonSpecialPrompts(button) {
     }
 }
 
+async function getItemSpecialPrompts(item_id, button) {
+    const data = await socketRequest("get_item_specialprompt", { item_id: item_id });
+    const specialPrompts = data.specialprompt || [];
+
+    if (Array.isArray(specialPrompts) && specialPrompts.length > 0) {
+        return specialPrompts;
+    }
+
+    if (typeof specialPrompts === "string" && specialPrompts.trim() !== "") {
+        return specialPrompts;
+    }
+
+    return getButtonSpecialPrompts(button);
+}
+
 // Builds the confirmation prompt list for a normal shop purchase.
 function getPurchaseConfirmationPrompts(cost, itemName, specialPrompts) {
     if (Array.isArray(specialPrompts) && specialPrompts.length > 0) {
         return specialPrompts;
+    }
+
+    if (typeof specialPrompts === "string" && specialPrompts.trim() !== "") {
+        return [specialPrompts];
     }
 
     return [
@@ -157,7 +176,7 @@ async function buyShopItem(cost, itemName, item_id, button) {
     const confirmationPrompts = getPurchaseConfirmationPrompts(
         cost,
         itemName,
-        getButtonSpecialPrompts(button)
+        await getItemSpecialPrompts(item_id, button)
     );
 
     for (const promptMessage of confirmationPrompts) {
