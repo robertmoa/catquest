@@ -5,7 +5,7 @@
 const chatButton = document.getElementById('btn_send');
 const chatInput = document.getElementById('input_send');
 const chatBox = document.getElementById('chat-box');
-const socket = io();
+
 
 function socketRequest(eventName, data = {}) {
     return new Promise((resolve) => {
@@ -45,7 +45,7 @@ function renderMessage(msg) {
     const div = document.createElement("div");
 
     if (msg.type === "system") {
-        div.className = "text-danger fst-italic";
+        div.className = "text-warning fst-italic";
         div.textContent = msg.text;
     }
 

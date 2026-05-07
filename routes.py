@@ -2,7 +2,7 @@ from flask import render_template, Blueprint, redirect, request, url_for, sessio
 from models import User
 from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
-from serverstuff import db, users, socketio
+from serverstuff import db, users
 from loginmgmt import handle_login
 main = Blueprint("main", __name__)
 
@@ -21,6 +21,7 @@ def login():
 
     if user and check_password_hash(user.password, password):
         handle_login(username)
+        
         return redirect(url_for("main.home"))
     return render_template("login.html", error="Username/password is not correct")
 
@@ -47,17 +48,20 @@ def signup():
 
 @main.route("/home")
 def home():
-    return render_template("main.html")
+    username = session["username"]
+    return render_template("main.html",user=username,page="dashboard")
 
 
 @main.route("/dungeon")
 def dungeon():
-    return render_template("dungeon.html")
+    username = session["username"]
+    return render_template("dungeon.html",user=username,page="dungeon")
 
 
 @main.route("/shop")
 def shop():
-    return render_template("shop.html")
+    username = session["username"]
+    return render_template("shop.html",user=username,page="shop")
 
             
  

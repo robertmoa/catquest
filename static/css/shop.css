@@ -32,14 +32,6 @@ body {
   max-width: 38ch;
 }
 
-.shop-tabs {
-  flex-wrap: wrap;
-}
-
-.shop-tab-button {
-  min-width: 128px;
-}
-
 .shop-fixed-panel {
   position: fixed;
   top: 8.5rem;

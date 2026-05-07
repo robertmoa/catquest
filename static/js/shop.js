@@ -6,11 +6,11 @@ const MYSTERY_BOX_NOTHING_CHANCE = 20;
 const MYSTERY_BOX_MIN_GOLD_REWARD = 50;
 const MYSTERY_BOX_MAX_GOLD_REWARD = 250;
 const MYSTERY_BOX_LOW_REWARD_BIAS = 2.2;
-const shopSocket = io();
+
 
 function socketRequest(eventName, data = {}) {
     return new Promise((resolve) => {
-        shopSocket.emit(eventName, data, (response) => {
+        socket.emit(eventName, data, (response) => {
             resolve(response || { success: false, error: "No response from server" });
         });
     });
@@ -19,22 +19,21 @@ async function loadItems() {
     const items = await socketRequest("get_all_items");
     return items;
 }
-async function loadUsername() {
-    const data = await socketRequest("get_user_info");
+// --At the moment this isnt needed, as i have changed it to get the username from the server when it loads the template
+// async function loadUsername() {
+//     const data = await socketRequest("get_user_info");
 
-    const element = document.getElementById("player-username");
+//     const element = document.getElementById("player-username");
 
-    if (!element) return;
+//     if (!element) return;
 
-    if (!data.success) {
-        element.textContent = "Not logged in";
-        return;
-    }
+//     if (!data.success) {
+//         element.textContent = "Not logged in";
+//         return;
+//     }
+// }
 
-    element.textContent = data.username;
-}
-
-document.addEventListener("DOMContentLoaded", loadUsername);
+//document.addEventListener("DOMContentLoaded", loadUsername);
 
 
 // Gets the player's current gold total from the database.

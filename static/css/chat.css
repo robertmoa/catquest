@@ -1,14 +1,14 @@
 .glass-effect {
   /* Requires some transparency to see the blur */
-  background-color: rgba(255, 255, 255, 0.4); 
+  background-color: rgba(255, 255, 255, 0.2); 
   /* The blur effect */
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(10px); /* Support for Safari */
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px); /* Support for Safari */
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .chat-panel {
   position: fixed;
-  bottom: 20px;
+  bottom: 80px;
   right: 20px;
 
   width: 30vw;
@@ -40,19 +40,16 @@
   overflow-x: hidden;      /* prevent horizontal scrolling */
   word-wrap: break-word;   /* wrap long words */
   overflow-wrap: break-word; /* modern version */
+  
+  max-height: 80vh; 
+  
 }
-/* Navbar wrapper */
-.nav-wrapper {
-  position: sticky;
-  top: 10px;
 
-  z-index: 1050;
-}
 
 /* Chat button under navbar */
 .chat-row-fixed {
-  position: sticky;
-  top: 100px; /* navbar height + spacing */
-  right: 30px;
+  position: fixed;
+  bottom: 20px; /* navbar height + spacing */
+  right: 20px;
   z-index: 1040;
 }
