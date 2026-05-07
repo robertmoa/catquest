@@ -121,3 +121,11 @@ body {
     max-width: none;
   }
 }
+body {
+  background:
+    
+    url("/static/images/landscape.png");
+  background-position: center;
+  background-size: cover;
+  image-rendering: pixelated; /* Ensures sharp pixels */
+}

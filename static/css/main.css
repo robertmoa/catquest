@@ -28,3 +28,15 @@ img {
   width: 256px;
   height: 256px;
 }
+.inventory-grid{
+  height: 88vh
+}
+
+body {
+  background:
+    
+    url("/static/images/landscape.png");
+  background-position: center;
+  background-size: cover;
+  image-rendering: pixelated; /* Ensures sharp pixels */
+}
