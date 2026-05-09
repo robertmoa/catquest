@@ -10,11 +10,15 @@ from flask import session, request
 
 @socketio.on("connect")
 def connection():
-    users[session["username"]] = request.sid
-    join_room(session["username"])
+    username = session.get("username")
+    if username:
+        users[username] = request.sid
+        join_room(username)
 
 @socketio.on("disconnect")
 def disconnection():
-    del users[session["username"]]
-    leave_room(session["username"])
+    username = session.get("username")
+    if username and username in users:
+        del users[username]
+        leave_room(username)
 

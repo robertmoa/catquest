@@ -2,6 +2,7 @@ from flask import Flask
 from serverstuff import socketio, db
 from routes import main
 from shop_sockets import seed_swords, seed_armour
+from dungeon_sockets import seed_monsters
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "secret!"
@@ -17,4 +18,5 @@ with app.app_context():
     db.create_all()
     sword_count = seed_swords()
     hat_count = seed_armour()
+    monster_count = seed_monsters()
     print(f"database done")

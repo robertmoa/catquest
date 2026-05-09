@@ -140,12 +140,13 @@ def get_user_info(data=None):
 @socketio.on("get_user_items")
 def get_items(data=None):
     username = session.get("username")
+    if username is None:
+        return []
     user = db.session.execute(
         select(User).where(User.username == username)
     ).scalar_one_or_none()
-    if user.items == None:
-        user.items = []
-        db.session.commit()
+    if user is None:
+        return []
     payload = []
     for user_item in user.items:
         item = user_item.item

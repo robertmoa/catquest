@@ -126,8 +126,9 @@ class Monster(db.Model):
     damage: Mapped[int] = mapped_column()
     #Gold reward, can have this randomly vary
     reward: Mapped[int] = mapped_column()
+    special_type: Mapped[str] = mapped_column(String(30), nullable=True)
 
-    
+
 
 
 #--CHAT HISTORY--# (Important for any web app with chat. 

@@ -22,6 +22,7 @@ def create_app():
     import shop_sockets
     import user_handling
     import sockets
+    import dungeon_sockets
 
 
     return app

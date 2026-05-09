@@ -7,6 +7,21 @@ from loginmgmt import handle_login
 main = Blueprint("main", __name__)
 
 
+def require_valid_user():
+    """Return the username if the session points to a real DB user, else None.
+    Clears the session if the user is missing so the client re-logs in."""
+    username = session.get("username")
+    if not username:
+        return None
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+    if user is None:
+        session.clear()
+        return None
+    return username
+
+
 @main.route("/", methods=["GET"])
 def login_page():
     return render_template("login.html")
@@ -48,19 +63,25 @@ def signup():
 
 @main.route("/home")
 def home():
-    username = session["username"]
+    username = require_valid_user()
+    if username is None:
+        return redirect(url_for("main.login_page"))
     return render_template("main.html",user=username,page="dashboard")
 
 
 @main.route("/dungeon")
 def dungeon():
-    username = session["username"]
+    username = require_valid_user()
+    if username is None:
+        return redirect(url_for("main.login_page"))
     return render_template("dungeon.html",user=username,page="dungeon")
 
 
 @main.route("/shop")
 def shop():
-    username = session["username"]
+    username = require_valid_user()
+    if username is None:
+        return redirect(url_for("main.login_page"))
     return render_template("shop.html",user=username,page="shop")
 
             
