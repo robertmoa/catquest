@@ -141,6 +141,7 @@ async function buyShopItem(cost, itemName) {
         if (!confirmedPurchase) {
             return false;
         }
+        
     }
 
     const wasPurchased = await spendPlayerGold(cost);

@@ -1,8 +1,8 @@
 from flask_socketio import emit
 from serverstuff import socketio, users, db
 from flask import request,session
-from models import User, UserStat, ChatHistory
-from sqlalchemy import select
+from models import User, UserStat, ChatHistory, UserItem, Sword, Armour
+from sqlalchemy import select, desc
 #handles chat messages including whispering
 
 @socketio.on('chatmsg')
@@ -136,3 +136,43 @@ def get_user_info(data=None):
         "id": user.id,
         "username": user.username,
     }
+
+@socketio.on("get_user_items")
+def get_items(data=None):
+    username = session.get("username")
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+    if user.items == None:
+        user.items = []
+        db.session.commit()
+    payload = []
+    for user_item in user.items:
+        item = user_item.item
+        itemdata = {
+            "name": item.name,
+            "imgpath": item.imgpath,
+            "type": item.itype,
+            "description": item.description,
+        }
+        if isinstance(item, Sword):
+            itemdata["attack"] = item.attack
+        else:
+            itemdata["defense"] = item.defense
+        payload.append(itemdata)
+    return payload
+
+@socketio.on("get_leaderboard")
+def get_top_5_gold(data=None):
+    top_users = (
+    db.session.query(User)
+    .join(UserStat)
+    .order_by(UserStat.gold.desc())
+    .limit(5)
+    .all()
+    )
+    payload = []
+    for index, user in enumerate(top_users, start=1):
+        payload.append({"number": index,"username": user.username, "gold": user.data.gold})
+    print(payload)
+    return payload
