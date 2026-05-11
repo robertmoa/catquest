@@ -20,8 +20,9 @@ def create_app():
 
     import models
     import shop_sockets
-    import connections
+    import user_handling
     import sockets
+    import dungeon_sockets
 
 
     return app
