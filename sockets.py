@@ -2,6 +2,7 @@ from flask_socketio import emit
 from serverstuff import socketio, users, db
 from flask import request,session
 from models import User, UserStat, ChatHistory, UserItem, Sword, Armour
+from shop_sockets import ensure_user_stat
 from sqlalchemy import select, desc
 #handles chat messages including whispering
 
@@ -147,10 +148,12 @@ def get_items(data=None):
     ).scalar_one_or_none()
     if user is None:
         return []
+    user_stats = ensure_user_stat(user)
     payload = []
     for user_item in user.items:
         item = user_item.item
         itemdata = {
+            "id": item.id,
             "name": item.name,
             "imgpath": item.imgpath,
             "type": item.itype,
@@ -158,8 +161,10 @@ def get_items(data=None):
         }
         if isinstance(item, Sword):
             itemdata["attack"] = item.attack
+            itemdata["equipped"] = item.id == user_stats.equipped_weapon
         else:
             itemdata["defense"] = item.defense
+            itemdata["equipped"] = item.id == user_stats.equipped_armour
         payload.append(itemdata)
     return payload
 

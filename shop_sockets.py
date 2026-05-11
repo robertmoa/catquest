@@ -173,7 +173,6 @@ def buy_item(data):
     )
 
     db.session.add(user_item)
-    equip_item(user, item)
     db.session.commit()
 
     return {
@@ -291,6 +290,48 @@ def check_own_item(data):
         return {"owns": False}
 
     return {"owns": check_user_owns_item(user, item_id)}
+
+
+@socketio.on("equip_item")
+def handle_equip_item(data):
+    username = session.get("username")
+
+    if username is None:
+        return {"success": False, "error": "Not logged in"}
+
+    user = db.session.execute(
+        select(User).where(User.username == username)
+    ).scalar_one_or_none()
+
+    if user is None:
+        return {"success": False, "error": "User not found"}
+
+    user_stats = ensure_user_stat(user)
+    item_id = get_item_id(data)
+
+    if item_id is None:
+        return {"success": False, "error": "Missing item_id"}
+
+    item = db.session.execute(
+        select(Item).where(Item.id == item_id)
+    ).scalar_one_or_none()
+
+    if item is None:
+        return {"success": False, "error": "Item not found"}
+
+    if not check_user_owns_item(user, item.id):
+        return {"success": False, "error": "You do not own this item"}
+
+    equip_item(user, item)
+    db.session.commit()
+
+    return {
+        "success": True,
+        "item_id": item.id,
+        "item_type": item.itype,
+        "equipped_weapon": user_stats.equipped_weapon,
+        "equipped_armour": user_stats.equipped_armour,
+    }
 
 
 

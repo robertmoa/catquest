@@ -20,6 +20,34 @@ async function loadLeaderboard() {
     return top_users
 }
 
+function setEquipButtonState(button, equipped) {
+    button.textContent = equipped ? "Equipped" : "Equip";
+    button.disabled = equipped;
+    button.classList.toggle("btn-primary", !equipped);
+    button.classList.toggle("btn-success", equipped);
+}
+
+function updateEquippedButtons(itemType, itemId) {
+    const equipButtons = document.querySelectorAll(".equip-weapon-button");
+
+    equipButtons.forEach((button) => {
+        if (button.dataset.itemType === itemType) {
+            setEquipButtonState(button, button.dataset.itemId === String(itemId));
+        }
+    });
+}
+
+async function equipInventoryItem(itemId, button) {
+    const data = await socketRequest("equip_item", { item_id: itemId });
+
+    if (!data.success) {
+        window.alert(data.error || "Could not equip item.");
+        return;
+    }
+
+    updateEquippedButtons(data.item_type, data.item_id);
+}
+
 async function initializeInventory() {
     const items = await loadInventory();
     console.log(items);
@@ -30,7 +58,16 @@ async function initializeInventory() {
         card.querySelector('.card-image-top').src = item.imgpath;
         card.querySelector('.card-title').textContent = item.name;
         const stat = card.querySelector(".statline");
-        if(item.itype == "sword"){
+        const equipButton = card.querySelector(".equip-weapon-button");
+
+        equipButton.dataset.itemId = String(item.id);
+        equipButton.dataset.itemType = item.type;
+        setEquipButtonState(equipButton, item.equipped);
+        equipButton.addEventListener("click", () => {
+            equipInventoryItem(item.id, equipButton);
+        });
+
+        if(item.type == "sword"){
             stat.textContent = `Damage: ${item.attack}`;
         }
         else
@@ -67,4 +104,3 @@ async function initializeDashboard() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeDashboard();
 });
-
