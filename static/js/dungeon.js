@@ -70,18 +70,16 @@ async function loadMonsterPool() {
 
 const player = {
   name: "Player",
-  currentHp: 30,
-  maxHp: 30,
+  currentHp: 0,
+  maxHp: 0,
   level: 1,
   experience: 0,
   enemyCount: 0,
 
-  baseAttack: 5,
-  attackBonus: 0,
-  weaponBonus: 0,
+  attack: 0,
 
-  baseDefence: 0,
-  hatBonus: 0,
+  defense: 0,
+
 
   currentStamina: 0,
 
@@ -99,13 +97,6 @@ const player = {
 
   defenceMultActive: 0,
 
-  get totalAttack() {
-    return this.baseAttack + this.attackBonus + this.weaponBonus;
-  },
-
-  get totalDefence() {
-    return this.baseDefence + Math.floor(this.level / 2) + this.hatBonus;
-  },
 
   get maxStamina() {
     return 3 + Math.floor(this.level / 2);
@@ -186,33 +177,24 @@ function createEnemy(enemyNumber) {
   var templateIndex = Math.floor(Math.random() * monsterPool.length);
   var template = monsterPool[templateIndex] || { name: "Cat", entrymsg: "A cat appears!", imgpath: "/static/images/ecatsprite.png", max_hp: 20, damage: 4, reward: 10 };
 
-  var hp = 10 + enemyNumber * 2;
-  var attack = 2 + Math.floor(enemyNumber / 3);
-  var defence = Math.floor(enemyNumber / 8);
-  var goldDrop = 5 + Math.floor(enemyNumber * 1.5);
-  var xpDrop = 20 + enemyNumber * 3;
+  var hp = template.max_hp
+  var attack = template.damage
+  var defence = 0
+  var goldDrop = template.reward
+  var xpDrop = Math.floor(template.max_hp/2)
 
   var entrymsg = template.entrymsg;
   var imgpath = template.imgpath;
 
-  if (isBoss) {
-    hp = Math.floor(hp * 3);
-    attack = Math.floor(attack * 1.5);
-    defence = Math.floor(defence * 1.5);
-    goldDrop *= 5;
-    xpDrop *= 3;
-    entrymsg = "Boss #" + enemyNumber + " emerges from the darkness... prepare yourself!";
-    imgpath = "/static/images/ecatsprite.png";
-  } else {
-    var variant = pickVariant();
-    hp = Math.max(1, Math.floor(hp * variant.hpMult));
-    attack = Math.max(1, Math.floor(attack * variant.atkMult));
-    defence = Math.floor(defence * variant.defMult);
-  }
+  
 
-  var displayName = isBoss
-    ? "Boss - " + template.name + " #" + enemyNumber
-    : template.name + " #" + enemyNumber + variant.suffix;
+  var variant = pickVariant();
+  hp = Math.max(1, Math.floor(hp * variant.hpMult));
+  attack = Math.max(1, Math.floor(attack * variant.atkMult));
+  defence = Math.floor(defence * variant.defMult);
+  
+
+  var displayName = template.name + variant.suffix;
 
   return {
     name: displayName,
@@ -288,8 +270,8 @@ function updatePlayerStatsUI() {
   if (levelEl) levelEl.textContent = player.level;
   if (xpEl) xpEl.textContent = `${player.experience} / ${xpThreshold}`;
   if (xpFillEl) xpFillEl.style.width = `${xpPercent}%`;
-  if (attackEl) attackEl.textContent = player.totalAttack;
-  if (defenceEl) defenceEl.textContent = player.totalDefence;
+  if (attackEl) attackEl.textContent = player.attack;
+  if (defenceEl) defenceEl.textContent = player.defense;
   if (enemyCountEl) enemyCountEl.textContent = player.enemyCount;
 
   var critEl = document.getElementById("player-crit");
@@ -363,17 +345,17 @@ function logAction(message) {
 
 function levelUp() {
   player.level += 1;
-  player.maxHp += 10;
   player.currentStamina = player.maxStamina;
-
-  logAction(`Level Up! You are now level ${player.level}. Max HP increased to ${player.maxHp}.`);
+  player.xp = 0;
+  logAction(`Level Up! You are now level ${player.level}.`);
   logAction("Stamina fully restored.");
 
-  savePlayerStats();
+  
   saveProgressToServer();
 }
 
 function gainExperience(xpAmount) {
+  console.log(xpAmount);
   player.experience += xpAmount;
 
   while (player.experience >= getXpThresholdForLevel(player.level)) {
@@ -384,7 +366,7 @@ function gainExperience(xpAmount) {
 
   updatePlayerStatsUI();
   updateHpUI(player, playerHpFill, playerHpText);
-  savePlayerStats();
+  
 }
 
 
@@ -397,7 +379,7 @@ function rollCrit(damage) {
 }
 
 function playerAttack(damageMult, actionName) {
-  let raw = player.totalAttack * damageMult;
+  let raw = player.attack
   raw = rollCrit(raw);
   const effectiveDefence = enemy.defReduced ? Math.floor(enemy.defence * 0.3) : enemy.defence;
   const comboBonus = comboCount >= 2 ? comboCount : 0;
@@ -421,29 +403,29 @@ function enemyAttackPlayer() {
     return;
   }
 
-  if (enemy.specialType === "sorcerer") {
-    if (enemy.status.charging === 0) {
-      enemy.status.charging = 1;
-      enemy.status.chargePayload = Math.floor(5 + player.level * 2);
-      logAction("Sorcerer Cat is channelling a spell... (use Stagger to interrupt!)");
-      renderStatusDisplay(enemy, "enemy-status-display");
-      player.defenceMultActive = 0;
-      return;
-    } else if (enemy.status.charging > 0) {
-      var spellDamage = enemy.status.chargePayload;
-      player.currentHp = Math.max(0, player.currentHp - spellDamage);
-      updateHpUI(player, playerHpFill, playerHpText);
-      logAction("Sorcerer Cat unleashes arcane fire! " + spellDamage + " true damage!");
-      enemy.status.charging = 0;
-      enemy.status.chargePayload = 0;
-      renderStatusDisplay(enemy, "enemy-status-display");
-      comboCount = 0;
-      player.defenceMultActive = 0;
-      return;
-    }
-  }
+  // if (enemy.specialType === "sorcerer") {
+  //   if (enemy.status.charging === 0) {
+  //     enemy.status.charging = 1;
+  //     enemy.status.chargePayload = Math.floor(5 + player.level * 2);
+  //     logAction("Sorcerer Cat is channelling a spell... (use Stagger to interrupt!)");
+  //     renderStatusDisplay(enemy, "enemy-status-display");
+  //     player.defenceMultActive = 0;
+  //     return;
+  //   } else if (enemy.status.charging > 0) {
+  //     var spellDamage = enemy.status.chargePayload;
+  //     player.currentHp = Math.max(0, player.currentHp - spellDamage);
+  //     updateHpUI(player, playerHpFill, playerHpText);
+  //     logAction("Sorcerer Cat unleashes arcane fire! " + spellDamage + " true damage!");
+  //     enemy.status.charging = 0;
+  //     enemy.status.chargePayload = 0;
+  //     renderStatusDisplay(enemy, "enemy-status-display");
+  //     comboCount = 0;
+  //     player.defenceMultActive = 0;
+  //     return;
+  //   }
+  // }
 
-  let defence = player.totalDefence;
+  let defence = player.defense;
   if (player.defenceMultActive) {
     defence = Math.floor(defence * player.defenceMultActive);
   }
@@ -480,6 +462,7 @@ function regenStamina() {
 
 function spawnNewEnemy() {
   enemy = createEnemy(player.enemyCount + 1);
+  console.log(enemy);
 
   if (enemy.entrymsg) {
     logAction(enemy.entrymsg);
@@ -512,7 +495,7 @@ function handleEnemyDefeat() {
   gainExperience(xpReward);
   logAction(`Enemy defeated! Gained ${goldReward} gold, ${xpReward} XP.`);
   player.enemyCount += 1;
-  savePlayerStats();
+  
 
   player.defenceMultActive = 0;
 
@@ -537,7 +520,7 @@ function handleFlee() {
   logAction("You fled the dungeon!");
   dungeonGoldEarned = 0;
   player.enemyCount = 0;
-  savePlayerStats();
+  
 
   battleLocked = true;
   setTimeout(() => {
@@ -667,7 +650,7 @@ function runActionEffect(action) {
     logAction(`You heal for ${action.healFlat} HP!`);
 
   } else if (action.type === "shield_break") {
-    const damage = Math.max(1, Math.floor(player.totalAttack * action.damageMult));
+    const damage = Math.max(1, Math.floor(player.attack * action.damageMult));
     applyDamage(enemy, damage);
     updateHpUI(enemy, enemyHpFill, enemyHpText);
     enemy.defReduced = true;
@@ -784,69 +767,23 @@ document.addEventListener("keydown", (e) => {
 });
 
 
-function loadPlayerStats() {
-  player.level = Number(localStorage.getItem("catquest_player_level")) || 1;
-  player.experience = Number(localStorage.getItem("catquest_player_experience")) || 0;
-  player.enemyCount = Number(localStorage.getItem("catquest_player_enemy_count")) || 0;
-  player.attackBonus = Number(localStorage.getItem("catquest_player_max_attack")) || 0;
-  player.weaponBonus = Number(localStorage.getItem("catquest_player_weapon_bonus")) || 0;
-  player.hatBonus = Number(localStorage.getItem("catquest_player_hat_bonus")) || 0;
-  const savedStamina = localStorage.getItem("catquest_player_current_stamina");
-  player.currentStamina = savedStamina !== null ? Number(savedStamina) : player.maxStamina;
-
-  const ownedRaw = localStorage.getItem("catquest_player_owned_skills");
-  player.ownedSkills = ownedRaw ? JSON.parse(ownedRaw) : [];
-  if (!player.ownedSkills.includes("stagger")) player.ownedSkills.push("stagger");
-
-  const savedMaxHp = Number(localStorage.getItem("catquest_player_max_hp"));
-  player.maxHp = savedMaxHp || (30 + (player.level - 1) * 10);
+async function loadPlayerStats() {
+  stat = await dungeonSocketRequest("get_user_stats")
+  console.log(stat)
+  player.level = stat.level;
+  player.experience = stat.xp;
+  player.enemyCount = 0;
+  player.attack = stat.damage;
+  player.defense = stat.defense;
+  //calculation for this is (level * 15) + 20 (20 is base health as u start at 0)
+  player.maxHp = (stat.level * 15) + 20;
   player.currentHp = player.maxHp;
 }
 
-function savePlayerStats() {
-  localStorage.setItem("catquest_player_level", String(player.level));
-  localStorage.setItem("catquest_player_experience", String(player.experience));
-  localStorage.setItem("catquest_player_enemy_count", String(player.enemyCount));
-  localStorage.setItem("catquest_player_max_attack", String(player.attackBonus));
-  localStorage.setItem("catquest_player_weapon_bonus", String(player.weaponBonus));
-  localStorage.setItem("catquest_player_hat_bonus", String(player.hatBonus));
-  localStorage.setItem("catquest_player_current_stamina", String(player.currentStamina));
-  localStorage.setItem("catquest_player_owned_skills", JSON.stringify(player.ownedSkills));
-  localStorage.setItem("catquest_player_max_hp", String(player.maxHp));
+
+async function initializePlayerStats() {
+  await loadPlayerStats();
 }
-
-function initializePlayerStats() {
-  loadPlayerStats();
-  savePlayerStats();
-}
-
-
-function increaseMaxAttack(bonus) {
-  player.attackBonus += bonus;
-  savePlayerStats();
-  updatePlayerStatsUI();
-}
-window.increaseMaxAttack = increaseMaxAttack;
-
-window.equipWeapon = function (bonus) {
-  player.weaponBonus = bonus;
-  savePlayerStats();
-  updatePlayerStatsUI();
-};
-
-window.equipHat = function (bonus) {
-  player.hatBonus = bonus;
-  savePlayerStats();
-  updatePlayerStatsUI();
-};
-
-window.unlockSkill = function (skillId) {
-  if (ACTIONS[skillId] && !player.ownedSkills.includes(skillId)) {
-    player.ownedSkills.push(skillId);
-    savePlayerStats();
-    rebuildActionButtons();
-  }
-};
 
 async function updateGoldDisplay() {
   var gold = await window.getPlayerGold();
@@ -855,20 +792,24 @@ async function updateGoldDisplay() {
     goldEl.textContent = gold;
   }
 }
+
 window.addEventListener("playerGoldUpdated", () => updateGoldDisplay());
 
-initializePlayerStats();
-updateHpUI(player, playerHpFill, playerHpText);
-spawnNewEnemy();
-rebuildActionButtons();
-updateBattleUI();
-logAction("Battle started!");
+async function startGame(){
+  await initializePlayerStats();
+  updateHpUI(player, playerHpFill, playerHpText);
+  spawnNewEnemy();
+  rebuildActionButtons();
+  updateBattleUI();
+  logAction("Battle started!");
+}
 
 if (dungeonSocket) {
   if (dungeonSocket.connected) {
     // Socket already connected (reusing window.socket from connect.js)
     loadMonsterPool();
     updateGoldDisplay();
+    console.log("what")
   } else {
     dungeonSocket.on("connect", function () {
       loadMonsterPool();
@@ -894,4 +835,7 @@ document.querySelectorAll(".nav-link").forEach(function(link) {
       }
     }
   });
+});
+document.addEventListener("DOMContentLoaded", () => {
+    startGame();
 });

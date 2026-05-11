@@ -46,6 +46,7 @@ async function equipInventoryItem(itemId, button) {
     }
 
     updateEquippedButtons(data.item_type, data.item_id);
+    initializeStats();
 }
 
 async function initializeInventory() {
@@ -81,6 +82,11 @@ async function initializeStats() {
     const stats = await loadStats()
     document.getElementById("gold-stat").textContent = `Gold: ${stats.gold}`
     document.getElementById("lvl-stat").textContent = `Level ${stats.level}`
+    document.getElementById("hp-stat").textContent = `Health: ${(stats.level *15) +20}`
+    document.getElementById("def-stat").textContent = `Defense: ${stats.defense}`
+    document.getElementById("atk-stat").textContent = `Attack: ${stats.damage}`
+    document.getElementById("crit-stat").textContent = `Critical Strike Chance:  ${stats.crit_chance *100}%`
+    
 }
 async function initializeLeaderboard() {
     const top_users = await loadLeaderboard();
