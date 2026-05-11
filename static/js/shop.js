@@ -103,37 +103,80 @@ async function renderShopGold() {
     updateShopGoldDisplay(await getPlayerGold());
 }
 
-// Builds the confirmation prompt list for a normal shop purchase.
-// Most items use one prompt, while a couple have custom jokes and the uncertainty sword
-// intentionally makes the player click through several confirmations.
-function getPurchaseConfirmationPrompts(cost, itemName) {
-    const customPromptsByItem = {
-        "An Above Average Sized Dagger": [
-            "I assure you, I am actually above average size AND I am really funny\n\nBuy An Above Average Sized Dagger for " + cost + " gold?"
-        ],
-        "Wooden Sword": [
-            "Trust me, it's really strong wood\n\nBuy Wooden Sword for " + cost + " gold?"
-        ]
-    };
-
-    if (itemName === "Sword of Uncertainty") {
-        return [
-            "Are you sure you want to purchase this sword",
-            "Youre 100% certain?",
-            "But are you really sure? Like deadset you know you want this",
-            "This is your fourth confirmation. You must really want this, right?",
-            "Last chance! Theres no going back now"
-        ];
+function markItemPurchased(button) {
+    if (!button) {
+        return;
     }
 
-    return customPromptsByItem[itemName] || [
+    button.textContent = "Purchased";
+    button.disabled = true;
+    button.classList.remove("btn-primary", "btn-outline-primary");
+    button.classList.add("btn-success");
+    button.setAttribute("aria-disabled", "true");
+}
+
+function getButtonSpecialPrompts(button) {
+    if (!button || !button.dataset.specialprompt) {
+        return [];
+    }
+
+    try {
+        return JSON.parse(button.dataset.specialprompt) || [];
+    } catch (error) {
+        return [];
+    }
+}
+
+async function getItemSpecialPrompts(item_id, button) {
+    const data = await socketRequest("get_item_specialprompt", { item_id: item_id });
+    const specialPrompts = data.specialprompt || [];
+
+    if (Array.isArray(specialPrompts) && specialPrompts.length > 0) {
+        return specialPrompts;
+    }
+
+    if (typeof specialPrompts === "string" && specialPrompts.trim() !== "") {
+        return specialPrompts;
+    }
+
+    return getButtonSpecialPrompts(button);
+}
+
+// Builds the confirmation prompt list for a normal shop purchase.
+function getPurchaseConfirmationPrompts(cost, itemName, specialPrompts) {
+    if (Array.isArray(specialPrompts) && specialPrompts.length > 0) {
+        return specialPrompts;
+    }
+
+    if (typeof specialPrompts === "string" && specialPrompts.trim() !== "") {
+        return [specialPrompts];
+    }
+
+    return [
         "Are you sure you want to buy " + itemName + " for " + cost + " gold?"
     ];
 }
 
 // Handles buying one of the normal shop items.
-async function buyShopItem(cost, itemName) {
-    const confirmationPrompts = getPurchaseConfirmationPrompts(cost, itemName);
+async function buyShopItem(cost, itemName, item_id, button) {
+    if (button && button.disabled) {
+        return false;
+    }
+
+    if (button && button.dataset.purchasePending === "true") {
+        return false;
+    }
+
+    if (await checkOwns(item_id)) {
+        markItemPurchased(button);
+        return false;
+    }
+
+    const confirmationPrompts = getPurchaseConfirmationPrompts(
+        cost,
+        itemName,
+        await getItemSpecialPrompts(item_id, button)
+    );
 
     for (const promptMessage of confirmationPrompts) {
         const confirmedPurchase = window.confirm(promptMessage);
@@ -144,16 +187,54 @@ async function buyShopItem(cost, itemName) {
         
     }
 
-    const wasPurchased = await spendPlayerGold(cost);
+    if (button) {
+        button.dataset.purchasePending = "true";
+    }
 
-    if (!wasPurchased) {
-        window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
+    const data = await socketRequest("buy_item", { item_id: item_id });
+
+    if (button) {
+        delete button.dataset.purchasePending;
+    }
+
+    if (!data.success) {
+        if (data.gold !== undefined) {
+            updateShopGoldDisplay(data.gold);
+        }
+
+        if (data.owned) {
+            markItemPurchased(button);
+            return false;
+        }
+
+        if (data.error === "Not enough gold") {
+            window.alert("Uh oh, looks like your broke ass can't afford this. Get back to work.");
+            return false;
+        }
+
+        window.alert(data.error || "Purchase failed on server.");
         return false;
     }
 
-    window.alert("Purchased " + itemName + " for " + cost + " gold.");
+    updateShopGoldDisplay(data.gold);
+    markItemPurchased(button);
+    window.alert("Purchased " + itemName + " for " + data.cost + " gold.");
     return true;
 }
+
+async function owns(item_id) {
+    const data = await socketRequest("own_item", { item_id: item_id });
+
+    return data.success;
+}
+
+async function checkOwns(item_id) {
+    const data = await socketRequest("check_own_item", { item_id: item_id });
+
+    return data.owns;
+}
+
+
 
 // Rolls the mystery box result using the requested gold-only probability split:
 // 0.1% jackpot, 20% nothing, and the remaining chance becomes a weighted gold reward.
@@ -224,10 +305,11 @@ function initializeShopButtons() {
     const buyButtons = document.querySelectorAll(".buy-weapon-button");
 
     buyButtons.forEach((button) => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             const cost = Number(button.dataset.cost);
             const itemName = button.dataset.itemName || "item";
-            buyShopItem(cost, itemName);
+            const itemId = button.dataset.itemId;
+            await buyShopItem(cost, itemName, itemId, button);
         });
     });
 }
@@ -349,10 +431,15 @@ async function initializeShopCards() {
 
     items.forEach(item => {
         const card = shopCardTemplate.content.cloneNode(true);
+        const buyButton = card.querySelector(".buy-weapon-button");
 
-
-        card.querySelector(".buy-weapon-button").dataset.cost = String(item.cost);
-        card.querySelector(".buy-weapon-button").dataset.itemName = item.name;
+        buyButton.dataset.cost = String(item.cost);
+        buyButton.dataset.itemName = item.name;
+        buyButton.dataset.itemId = String(item.id);
+        buyButton.dataset.specialprompt = JSON.stringify(item.specialprompt || []);
+        if (item.owned) {
+            markItemPurchased(buyButton);
+        }
         card.querySelector('.card-image-top').src = item.imgpath;
         card.querySelector('.card-title').textContent = item.name;
         card.querySelector('.card-text.text-secondary.mb-4').textContent = `Price: ${item.cost}`;
@@ -393,6 +480,7 @@ window.buyMysteryBox = buyMysteryBox;
 window.renderShopGold = renderShopGold;
 window.buyShopItem = buyShopItem;
 window.initializeShopPage = initializeShopPage;
+window.checkOwns = checkOwns;
 
 // Wait until the page is loaded before we try to find buttons and DOM elements.
 document.addEventListener("DOMContentLoaded", () => {

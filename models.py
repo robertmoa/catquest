@@ -30,7 +30,10 @@ class UserStat(db.Model):
     #dungeon
     xp: Mapped[int] = mapped_column(default=0)
     level: Mapped[int] = mapped_column(default=0)
+    equipped_weapon: Mapped[int] = mapped_column(ForeignKey("item.id"),nullable=True,default=None)
+    equipped_armour: Mapped[int] = mapped_column(ForeignKey("item.id"),nullable=True,default=None)
     user: Mapped["User"] = relationship(back_populates="data")
+
 
 
 #--USER ITEM TABLE--# (Stores record of who has purchased, linked with item and user table to give each entry in those tables a owns/owned by list)
@@ -76,6 +79,7 @@ class Item(db.Model):
             "type": self.itype,
             "cost": self.cost,
             "description": self.description,
+            "specialprompt": self.specialprompt,
             "imgpath": self.imgpath,
         }
 
