@@ -143,6 +143,7 @@ catquest-equip/
 
 ```bash
 python -m unittest tests/test_unit.py # Specifically for unit testing for now.
+python -m unittest tests.test_selenium
 ```
 
 ---
