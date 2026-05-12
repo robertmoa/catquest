@@ -139,6 +139,14 @@ catquest-equip/
 
 ---
 
+## Running Tests
+
+```bash
+python -m unittest tests/test_unit.py # Specifically for unit testing for now.
+```
+
+---
+
 ## Troubleshooting
 
 ### Python not installed
