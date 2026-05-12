@@ -127,5 +127,8 @@ body {
     url("/static/images/landscape.png");
   background-position: center;
   background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
   image-rendering: pixelated; /* Ensures sharp pixels */
 }
