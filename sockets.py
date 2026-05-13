@@ -113,15 +113,19 @@ def get_user_stats(data=None):
         db.session.commit()
 
 
-    if noitems == True or user.data.equipped_weapon == None or user.data.equipped_armour == None:
+    if noitems == True or user.data.equipped_weapon == None:
         attack = 2
         crit_chance = 0
-        defense = 0
-      
     else:
         weapon = db.session.get(Item, user.data.equipped_weapon)
         attack = weapon.attack
         crit_chance = weapon.crit_chance
+
+    if noitems == True or user.data.equipped_armour == None:    
+        defense = 0
+      
+    else:
+        
         hat = db.session.get(Item, user.data.equipped_armour)
         defense = hat.defense
 
