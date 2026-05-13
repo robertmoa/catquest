@@ -329,6 +329,7 @@ function applyDamage(unit, amount) {
 
 function healUnit(unit, amount) {
   unit.currentHp = Math.min(unit.maxHp, unit.currentHp + amount);
+  healPulseUnit(player,"player-sprite");
 }
 
 
@@ -377,7 +378,20 @@ function rollCrit(damage) {
   }
   return damage;
 }
+function shakeUnit(unit,imageid) {
+  const img = document.getElementById(imageid);
+  img.classList.add('shaking');
+  // Remove class after animation finishes
+  setTimeout(() => img.classList.remove('shaking'), 500); 
 
+}
+function healPulseUnit(unit,imageid) {
+  const img = document.getElementById(imageid);
+  img.classList.add('healpulse');
+  // Remove class after animation finishes
+  setTimeout(() => img.classList.remove('healpulse'), 1000); 
+
+}
 function playerAttack(damageMult, actionName) {
   let raw = player.attack
   raw = rollCrit(raw);
@@ -387,6 +401,7 @@ function playerAttack(damageMult, actionName) {
   applyDamage(enemy, damage);
   updateHpUI(enemy, enemyHpFill, enemyHpText);
   logAction(`${actionName} hits for ${damage} damage!`);
+  shakeUnit(player,"player-sprite")
 }
 
 function enemyAttackPlayer() {
@@ -450,6 +465,7 @@ function enemyAttackPlayer() {
   }
 
   player.defenceMultActive = 0;
+  shakeUnit(enemy,"enemy-sprite")
 }
 
 function regenStamina() {
@@ -500,8 +516,12 @@ function handleEnemyDefeat() {
   player.defenceMultActive = 0;
 
   battleLocked = true;
+  document.getElementById("enemy-unit").hidden = true;
+  
+  
   setTimeout(() => {
     spawnNewEnemy();
+    document.getElementById("enemy-unit").hidden = false;
     battleLocked = false;
   }, 1000);
 }
@@ -573,7 +593,7 @@ function executeAction(actionId) {
       if (player.currentHp <= 0) handlePlayerDeath();
       updateBattleUI();
       battleLocked = false;
-    }, 500);
+    }, 1000);
     return;
   }
 
@@ -619,7 +639,7 @@ function executeAction(actionId) {
     }
     updatePlayerStatsUI();
     battleLocked = false;
-  }, 500);
+  }, 1000);
 
   updatePlayerStatsUI();
 }
@@ -638,16 +658,16 @@ function runActionEffect(action) {
     player.defenceMultActive = action.defenceMult;
     if (action.healFlat > 0) {
       healUnit(player, action.healFlat);
-      updateHpUI(player, playerHpFill, playerHpText);
+      updateHpUI(player, playerfHpFill, playerHpText);
       logAction(`${action.name}! Defence x${action.defenceMult}, healed ${action.healFlat} HP.`);
     } else {
       logAction(`${action.name}! Defence x${action.defenceMult} this turn.`);
     }
 
   } else if (action.type === "heal") {
-    healUnit(player, action.healFlat);
+    healUnit(player, Math.floor(player.maxHp*0.2));
     updateHpUI(player, playerHpFill, playerHpText);
-    logAction(`You heal for ${action.healFlat} HP!`);
+    logAction(`You heal for ${player.maxHp*0.2} HP!`);
 
   } else if (action.type === "shield_break") {
     const damage = Math.max(1, Math.floor(player.attack * action.damageMult));
