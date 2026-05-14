@@ -6,6 +6,8 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from werkzeug.security import generate_password_hash
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 def _free_port():
@@ -64,17 +66,7 @@ class VisualLoginTest(unittest.TestCase):
 
     def test_login_visually(self):
         # Valid credentials should redirect to /home — core happy path.
-        self.driver.get(f"{self.base_url}/")
-        time.sleep(1)
-
-        self.driver.find_element(By.ID, "username").send_keys("username")
-        time.sleep(0.5)
-
-        self.driver.find_element(By.ID, "password").send_keys("password")
-        time.sleep(0.5)
-
-        self.driver.find_element(By.ID, "submit-button").click()
-        time.sleep(1)
+        self._login_as_test_user()
 
         self.assertIn("/home", self.driver.current_url)
         print("Login worked! Now on:", self.driver.current_url)
@@ -139,16 +131,7 @@ class VisualLoginTest(unittest.TestCase):
         print("Wrong password error shown:", error_text) 
 
     def test_logout_visually(self):
-        # First log in
-        self.driver.get(f"{self.base_url}/")
-        time.sleep(1)
-
-        self.driver.find_element(By.ID, "username").send_keys("username")
-        time.sleep(0.5)
-        self.driver.find_element(By.ID, "password").send_keys("password")
-        time.sleep(0.5)
-        self.driver.find_element(By.ID, "submit-button").click()
-        time.sleep(1) 
+        self._login_as_test_user()
 
         # Now log out
         self.driver.find_element(By.XPATH, "//button[normalize-space()='Logout']").click()
@@ -161,22 +144,9 @@ class VisualLoginTest(unittest.TestCase):
 
 
     def test_switch_between_sword_and_hat_shop(self):
-        self.driver.get(f"{self.base_url}/")
-        time.sleep(1)
 
-        self.driver.find_element(By.ID, "toggle-button").click()
-        time.sleep(0.5)
+        self._login_as_test_user()
 
-        self.driver.find_element(By.ID, "username").send_keys("BallBlasterShotgunNado")
-        time.sleep(0.5)
-
-        self.driver.find_element(By.ID, "password").send_keys("password1")
-        time.sleep(0.5)
-
-        self.driver.find_element(By.ID, "submit-button").click()
-        time.sleep(1)
-
-        
         self.driver.find_element(By.LINK_TEXT, "shop").click()
         time.sleep(1)   
 
@@ -186,15 +156,74 @@ class VisualLoginTest(unittest.TestCase):
         self.assertEqual("Hat Shop", self.driver.find_element(By.ID, "shop-title").text)
         print("Switched to hat shop! Now on:", self.driver.current_url) 
 
+    def test_navigate_home_to_dungeon(self):
+        self._login_as_test_user()
+        self.driver.get(f"{self.base_url}/dungeon")
+        time.sleep(1)
+        self.assertIn("/dungeon",self.driver.current_url)
+        self.assertTrue(self.driver.find_element(By.ID, "battle-arena").is_displayed)
+
+    def test_running_dungeon_attack_heal(self):
+        self._login_as_test_user()
+        self.driver.get(f"{self.base_url}/dungeon")
+        time.sleep(0.5)
+        self.driver.find_element(By.ID, "Scratch").click()
+
+    def test_home_requires_login(self):
+        # /home must redirect unauthenticated visitors back to / — guards the dashboard.
+        self.driver.get(f"{self.base_url}/home")
+        time.sleep(1)
+        self.assertNotIn("/home", self.driver.current_url)
+        # Should be back at login page, so the login form is visible
+        self.assertTrue(self.driver.find_element(By.ID, "form").is_displayed())
+
+    def test_dungeon_requires_login(self):
+        # /dungeon must redirect unauthenticated visitors — guards the gameplay route.
+        self.driver.get(f"{self.base_url}/dungeon")
+        time.sleep(1)
+        self.assertNotIn("/dungeon", self.driver.current_url)
+        self.assertTrue(self.driver.find_element(By.ID, "form").is_displayed())
+
+    def test_shop_requires_login(self):
+        # /shop must redirect unauthenticated visitors — guards the shop route.
+        self.driver.get(f"{self.base_url}/shop")
+        time.sleep(1)
+        self.assertNotIn("/shop", self.driver.current_url)
+        self.assertTrue(self.driver.find_element(By.ID, "form").is_displayed())
+
+    def test_running_dungeon_attack_heal(self):
+        self._login_as_test_user()
+        self.driver.get(f"{self.base_url}/dungeon")
+
+        wait = WebDriverWait(self.driver, 10)
+
+        scratch_btn = wait.until(EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, '[data-action-id="attack"]')
+        ))
+        scratch_btn.click()
+        time.sleep(1)
+        heal_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-action-id="heal"]')))
+        heal_btn.click()
+        time.sleep(0.5)
+        self.assertIn("/dungeon", self.driver.current_url)  
+
+    def _login_as_test_user(self):
+        """Call upon this if you need to login, don't remake login every call."""
+        self.driver.get(f"{self.base_url}/")
+        self.driver.find_element(By.ID, "username").send_keys("username")
+        self.driver.find_element(By.ID, "password").send_keys("password")
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1)
 
 
 
 
-
-
-
-
-
+    def tearDown(self):
+        time.sleep(2)
+        self.driver.quit()
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
 
 if __name__ == "__main__":
     unittest.main()
