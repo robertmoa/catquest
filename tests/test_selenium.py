@@ -61,6 +61,7 @@ class VisualLoginTest(unittest.TestCase):
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(3)
 
+
     def test_login_visually(self):
         # Valid credentials should redirect to /home — core happy path.
         self.driver.get(f"{self.base_url}/")
@@ -77,6 +78,123 @@ class VisualLoginTest(unittest.TestCase):
 
         self.assertIn("/home", self.driver.current_url)
         print("Login worked! Now on:", self.driver.current_url)
+
+    def test_signup_visually(self):
+        self.driver.get(f"{self.base_url}/")
+        time.sleep(1)
+
+        self.driver.find_element(By.ID, "toggle-button").click()
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "username").send_keys("newuser")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "password").send_keys("newpassword")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1)
+
+        self.assertIn("/home", self.driver.current_url)
+        print("Signup worked! Now on:", self.driver.current_url)
+
+
+    def test_signup_with_taken_username_visually(self):
+        self.driver.get(f"{self.base_url}/")
+        time.sleep(1)
+
+        self.driver.find_element(By.ID, "toggle-button").click()
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "username").send_keys("username")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "password").send_keys("password")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1)
+
+        # Should still be on the signup page with an error message
+        self.assertIn("/signup", self.driver.current_url)
+        error_text = self.driver.find_element(By.ID, "error-message").text
+        self.assertIn("taken", error_text)
+        print("Duplicate username error shown:", error_text)
+
+    def test_wrong_password_visually(self):
+        self.driver.get(f"{self.base_url}/")
+        time.sleep(1)
+
+        self.driver.find_element(By.ID, "username").send_keys("username")
+        time.sleep(0.5)
+        self.driver.find_element(By.ID, "password").send_keys("wrongpassword")
+        time.sleep(0.5)
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1) 
+
+        # Should still be on the login page with an error message
+        self.assertIn("/login", self.driver.current_url)
+        error_text = self.driver.find_element(By.ID, "error-message").text
+        self.assertIn("not correct", error_text)
+        print("Wrong password error shown:", error_text) 
+
+    def test_logout_visually(self):
+        # First log in
+        self.driver.get(f"{self.base_url}/")
+        time.sleep(1)
+
+        self.driver.find_element(By.ID, "username").send_keys("username")
+        time.sleep(0.5)
+        self.driver.find_element(By.ID, "password").send_keys("password")
+        time.sleep(0.5)
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1) 
+
+        # Now log out
+        self.driver.find_element(By.XPATH, "//button[normalize-space()='Logout']").click()
+        time.sleep(1)
+
+        # Should be back on the login page
+        self.assertIn("/login", self.driver.current_url)
+        self.assertEqual("Login", self.driver.find_element(By.ID, "form-title").text)
+        print("Logout worked! Now on:", self.driver.current_url)
+
+
+    def test_switch_between_sword_and_hat_shop(self):
+        self.driver.get(f"{self.base_url}/")
+        time.sleep(1)
+
+        self.driver.find_element(By.ID, "toggle-button").click()
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "username").send_keys("BallBlasterShotgunNado")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "password").send_keys("password1")
+        time.sleep(0.5)
+
+        self.driver.find_element(By.ID, "submit-button").click()
+        time.sleep(1)
+
+        
+        self.driver.find_element(By.LINK_TEXT, "shop").click()
+        time.sleep(1)   
+
+        self.driver.find_element(By.ID, "hat-shop-button").click()
+        time.sleep(1)
+
+        self.assertEqual("Hat Shop", self.driver.find_element(By.ID, "shop-title").text)
+        print("Switched to hat shop! Now on:", self.driver.current_url) 
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
