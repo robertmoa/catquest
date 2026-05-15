@@ -4,11 +4,12 @@ from flask import request,session
 from models import User, UserStat, ChatHistory, UserItem, Sword, Armour
 from shop_sockets import ensure_user_stat
 from sqlalchemy import select, desc
+from flask_login import current_user
 #handles chat messages including whispering
 
 @socketio.on('chatmsg')
 def handle_chatmsg(msg):
-    username = session.get("username")
+    username = current_user.username
     text = msg.get("txt", "").strip()
 
     if not text:
@@ -71,7 +72,7 @@ def handle_chatmsg(msg):
 
 @socketio.on("get_my_chat_history")
 def get_msgs(data):
-    username = session["username"]
+    username = current_user.username
     messages = db.session.execute(
     db.select(ChatHistory)
     .where(ChatHistory.id > session["latest_msgid"])
@@ -94,17 +95,7 @@ def get_msgs(data):
 
 @socketio.on("get_user_stats")
 def get_user_stats(data=None):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     # make sure UserStat exists
     if user.data is None:
@@ -120,17 +111,7 @@ def get_user_stats(data=None):
 
 @socketio.on("get_user_info")
 def get_user_info(data=None):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     return {
         "success": True,
@@ -140,14 +121,7 @@ def get_user_info(data=None):
 
 @socketio.on("get_user_items")
 def get_items(data=None):
-    username = session.get("username")
-    if username is None:
-        return []
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-    if user is None:
-        return []
+    user = current_user
     user_stats = ensure_user_stat(user)
     payload = []
     for user_item in user.items:

@@ -2,12 +2,13 @@ from serverstuff import db
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String,ForeignKey,JSON,DateTime, func
 from datetime import datetime
+from flask_login import UserMixin
 
 #===USER STUFF===#
 
 #--BASE USER TABLE--# (The reason there is the user and user stat table is for readability, and speed)
 
-class User(db.Model):
+class User(UserMixin,db.Model):
     __tablename__ = "user"
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(20),unique =True, nullable=False)

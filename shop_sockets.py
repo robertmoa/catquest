@@ -2,6 +2,7 @@ from flask import Blueprint, session
 from models import User, UserItem, UserStat, Sword, Armour,Item
 from sqlalchemy import select
 from serverstuff import db, socketio
+from flask_login import current_user
 
 shop = Blueprint("shop", __name__, url_prefix="/shop")
 
@@ -67,19 +68,15 @@ def get_item_specialprompt(data):
 @socketio.on("get_all_items")
 def handle_getting_items(data):
     all_items = Item.query.all()
-    username = session.get("username")
     owned_item_ids = set()
 
-    if username is not None:
-        user = db.session.execute(
-            select(User).where(User.username == username)
-        ).scalar_one_or_none()
-
-        if user is not None:
-            owned_item_ids = {
-                user_item.item_id
-                for user_item in user.items
-            }
+  
+    user = current_user
+    
+    owned_item_ids = {
+        user_item.item_id
+        for user_item in user.items
+        }
 
     payload = []
 
@@ -93,17 +90,11 @@ def handle_getting_items(data):
 
 @socketio.on("add_gold")
 def handle_add_gold(data):
-    username = session.get("username")
+    
 
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
+    
 
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     if user.data is None:
         user.data = UserStat(gold=0, xp=0, level=0)
@@ -121,17 +112,7 @@ def handle_add_gold(data):
 
 @socketio.on("buy_item")
 def buy_item(data):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     user_stats = ensure_user_stat(user)
     item_id = get_item_id(data)
@@ -189,17 +170,7 @@ def buy_item(data):
 
 @socketio.on("spend_gold")
 def handle_spend_gold(data):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-    
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     ensure_user_stat(user)
     
@@ -222,17 +193,8 @@ def handle_spend_gold(data):
 
 @socketio.on("own_item")
 def own_item(data):
-    username = session.get("username")
+    user = current_user
 
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
 
     ensure_user_stat(user)
     item_id = get_item_id(data)
@@ -272,14 +234,9 @@ def own_item(data):
 
 @socketio.on("check_own_item")
 def check_own_item(data):
-    username = session.get("username")
 
-    if username is None:
-        return {"owns": False}
 
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
+    user = current_user
 
     if user is None:
         return {"owns": False}
@@ -294,17 +251,7 @@ def check_own_item(data):
 
 @socketio.on("equip_item")
 def handle_equip_item(data):
-    username = session.get("username")
-
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
-
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
-
-    if user is None:
-        return {"success": False, "error": "User not found"}
+    user = current_user
 
     user_stats = ensure_user_stat(user)
     item_id = get_item_id(data)
