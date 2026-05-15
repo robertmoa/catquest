@@ -154,9 +154,9 @@ body{
 }
 
 @keyframes shake {
-  0%, 100% { transform: translate(0, 0) rotate(0); }
+  0%, 100% { transform: translate(0, 0) rotate(0); scale: 1;}
   25% { transform: translate(2px, 2px) rotate(1deg); }
-  50% { transform: translate(-2px, -2px) rotate(-1deg); }
+  50% { transform: translate(-2px, -2px) rotate(-1deg); scale:1.1;}
   75% { transform: translate(2px, -2px) rotate(-1deg); }
 }
 
@@ -164,18 +164,22 @@ body{
 @keyframes heal-pulse {
   0% {
       filter: none;
+      scale: 1;
   }
 
   25% {
       filter: hue-rotate(70deg) saturate(1.8) brightness(1.15);
+      scale: 0.95;
   }
 
   50% {
       filter: hue-rotate(90deg) saturate(2.2) brightness(1.25);
+      
   }
 
   100% {
       filter: none;
+      scale: 1;
   }
 }
 
