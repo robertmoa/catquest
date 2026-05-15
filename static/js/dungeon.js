@@ -516,12 +516,12 @@ function handleEnemyDefeat() {
   player.defenceMultActive = 0;
 
   battleLocked = true;
-  document.getElementById("enemy-unit").hidden = true;
+  document.getElementById("enemy-unit").style.visibility = 'hidden';
   
   
   setTimeout(() => {
     spawnNewEnemy();
-    document.getElementById("enemy-unit").hidden = false;
+    document.getElementById("enemy-unit").style.visibility = 'visible';
     battleLocked = false;
   }, 1000);
 }
