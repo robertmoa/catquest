@@ -729,7 +729,7 @@ function rebuildActionButtons() {
 
   actions.forEach((action, index) => {
     const btn = document.createElement("button");
-    btn.classList.add("btn", "btn-sm", "action-btn", getButtonClass(action));
+    btn.classList.add("btn", "action-btn", "flex-fill", getButtonClass(action));
     btn.dataset.actionId = action.id;
     btn.dataset.index = String(index);
     btn.type = "button";

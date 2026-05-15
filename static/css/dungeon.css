@@ -1,19 +1,20 @@
 #battle-area {
-  position: relative;
-  height: calc(100vh - 100px);
 
-  background-image: url('../images/rpgbg.avif');
+  background-image: url('../images/rpgbg.png');
   background-size: cover;
-  background-position: center;
+  background-position: bottom;
   background-repeat: no-repeat;
+}
+body{
+  background-image: none !important;
+  background-color: var(--bs-dark);
 }
 
 #player-unit {
-  position: absolute;
-  bottom: 50px;
-  left: 50px;
+  height: 256px;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
 }
 
@@ -23,22 +24,24 @@
   order: -1;
 }
 
+#player-sprite-wrapper{
+  width: 256px;
+  height: auto;
+  
+  transform: translateY(30px);
+}
 #player-sprite {
-  width: 96px;
+  width: 256px;
   height: auto;
   image-rendering: pixelated;
+  
+
 }
 
-#battle-log {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  width: 300px;
-  z-index: 10;
-}
+
 
 .battle-log-messages {
-  height: 300px;
+  height: 150px;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.5);
   padding: 10px;
@@ -52,10 +55,8 @@
 }
 
 #enemy-sprite {
-  position: absolute;
-  top: 150px;
-  right: 100px;
-  width: 96px;
+  
+  width: 200px;
   height: auto;
   image-rendering: pixelated;
 }
@@ -88,11 +89,10 @@
 }
 
 #player-actions {
-  margin-top: 10px;
+  
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  max-width: 320px;
 }
 
 .action-btn {
@@ -106,19 +106,7 @@
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
 }
 
-#enemy-unit {
-  position: absolute;
-  top: 150px;
-  right: 100px;
-}
 
-#enemy-hud {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  width: 180px;
-  margin-bottom: 10px;
-}
 
 #player-stats {
   margin-top: 15px;
@@ -175,13 +163,19 @@
 
 @keyframes heal-pulse {
   0% {
-    filter: drop-shadow(0 0 0px rgba(60, 255, 0, 0.9));
-    transform: scale(1);
+      filter: none;
+  }
+
+  25% {
+      filter: hue-rotate(70deg) saturate(1.8) brightness(1.15);
+  }
+
+  50% {
+      filter: hue-rotate(90deg) saturate(2.2) brightness(1.25);
   }
 
   100% {
-    filter: drop-shadow(0 0 50px rgba(26, 255, 0, 0));
-    transform: scale(1);
+      filter: none;
   }
 }
 
@@ -190,5 +184,5 @@
   animation-iteration-count: 1;
 }
 .healpulse{
-  animation: heal-pulse 2s infinite;
+  animation: heal-pulse 1s ease-in-out;
 }
