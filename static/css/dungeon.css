@@ -1,69 +1,6 @@
-#battle-area {
-  position: relative;
-  height: calc(100vh - 100px);
-
-  background-image: url('../images/rpgbg.avif');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-#player-unit {
-  position: absolute;
-  bottom: 50px;
-  left: 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-#player-hud {
-  width: 200px;
-  margin-bottom: 15px;
-  order: -1;
-}
-
-#player-sprite {
-  width: 96px;
-  height: auto;
-  image-rendering: pixelated;
-}
-
-#battle-log {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  width: 300px;
-  z-index: 10;
-}
-
-.battle-log-messages {
-  height: 300px;
-  overflow-y: auto;
-  background: rgba(0, 0, 0, 0.5);
+.battle-page {
   padding: 10px;
-  border-radius: 8px;
-}
-
-.battle-log-entry {
-  color: white;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-#enemy-sprite {
-  position: absolute;
-  top: 150px;
-  right: 100px;
-  width: 96px;
-  height: auto;
-  image-rendering: pixelated;
-}
-
-
-.hp-label {
-  font-weight: bold;
-  margin-bottom: 4px;
+  box-sizing: border-box;
 }
 
 .hp-bar-bg {
@@ -73,79 +10,6 @@
   border-radius: 999px;
   overflow: hidden;
   border: 2px solid #222;
-}
-
-.hp-bar-fill {
-  width: 100%;
-  height: 100%;
-  background: limegreen;
-  transition: width 0.2s ease;
-}
-
-#player-hp-text {
-  margin-right: 4px;
-  font-size: 0.95rem;
-}
-
-#player-actions {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  max-width: 320px;
-}
-
-.action-btn {
-  min-width: 90px;
-  position: relative;
-}
-
-.action-btn.selected {
-  outline: 2px solid #ffd700;
-  outline-offset: 2px;
-  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-}
-
-#enemy-unit {
-  position: absolute;
-  top: 150px;
-  right: 100px;
-}
-
-#enemy-hud {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  width: 180px;
-  margin-bottom: 10px;
-}
-
-#player-stats {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.unit-stats {
-  font-size: 0.9rem;
-  color: white;
-}
-
-.stats-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  align-items: center;
-}
-
-.stat-label {
-  font-weight: bold;
-  color: #ddd;
-}
-
-.stat-value {
-  color: #fff;
-  font-weight: 500;
 }
 
 .xp-bar-bg {
@@ -158,9 +22,149 @@
   margin: 6px 0 10px 0;
 }
 
-.xp-bar-fill {
-  width: 0%;
+.hp-bar-fill {
   height: 100%;
-  background: #ffd700;
-  transition: width 0.2s ease;
+  width: 100%;
+  background: #2ecc71;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  width: 0;
+  background: #f1c40f;
+  transition: width 0.3s ease;
+}
+
+.unit-panel {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+#battle-area {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 100px);
+  min-height: 400px;
+
+  background-image: url('../images/rpgbg.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+
+#battle-log {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  width: clamp(160px, 28%, 300px);
+  z-index: 10;
+}
+
+.battle-log-messages {
+  height: clamp(150px, 25vh, 300px);
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.battle-log-entry {
+  color: white;
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+  line-height: 1.6;
+}
+
+
+#player-unit {
+  position: absolute;
+  bottom: 4%;
+  left: 2%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+#player-hud {
+  box-sizing: border-box;
+  padding: 10px;
+  width: clamp(150px, 20vw, 220px);
+  margin-bottom: 15px;
+  order: -1;
+}
+
+#player-sprite {
+  width: clamp(64px, 8vw, 96px);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+#player-actions {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: clamp(200px, 30vw, 320px);
+}
+
+#enemy-unit {
+  position: absolute;
+  top: 20%;
+  right: 8%;
+}
+
+#enemy-sprite {
+  width: clamp(64px, 8vw, 96px);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+#enemy-hud {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  width: clamp(140px, 18vw, 200px);
+  margin-bottom: 10px;
+}
+
+/* ── Mobile: stack everything readable ── */
+@media (max-width: 600px) {
+  #battle-area {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  #battle-log {
+    width: 60%;
+    left: 2%;
+    top: 2%;
+    max-width: none;
+    z-index: 5;
+    opacity: 0.85;
+  }
+
+  .battle-log-messages {
+    height: clamp(80px, 15vh, 140px);
+  }
+
+  #player-unit {
+    bottom: 2%;
+    left: 2%;
+    z-index: 30;
+  }
+
+  #enemy-unit {
+    top: 40%;
+    right: 4%;
+  }
+
+  #player-hud {
+    width: 140px;
+  }
 }

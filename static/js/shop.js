@@ -403,24 +403,6 @@ function initializeShopGoldDisplay() {
     renderShopGold();
 }
 
-// Dev helper button that adds 500 gold, that actually works with the database.
-function initializeShopAddGoldButton() {
-    const addGoldButton = document.getElementById("add-gold-button");
-
-    if (!addGoldButton) {
-        return;
-    }
-
-    addGoldButton.addEventListener("click", async () => {
-        const gold = await addPlayerGold(500);
-
-        if (gold === null) {
-            window.alert("An error occurred while adding gold.");
-            return;
-        }
-
-    });
-}
 // For the swords and hats, we ask for all the items in the item database and depending on if they are a sword or a hat, we put them in the seperate categories
 async function initializeShopCards() {
     const items = await loadItems();
