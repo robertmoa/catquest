@@ -90,7 +90,7 @@
 
                 <!-- ENEMY -->
                 <section id="enemy-unit"
-                         class="battle-unit flex-column align-items-center"
+                         class="d-flex battle-unit flex-column align-items-center justify-content-center"
                          aria-label="Enemy">
 
                     <div id="enemy-hud" class="unit-panel">
@@ -112,14 +112,16 @@
                     
                     <img id="enemy-sprite"
                          src="{{ url_for('static', filename='images/ecatsprite.png') }}"
-                         alt="Enemy cat sprite">
+                         alt="Enemy cat sprite"
+                         class="m-2">
+                         
                     
 
                 </section>
 
                 <!-- PLAYER -->
                 <section id="player-unit"
-                         class="battle-unit d-flex flex-column align-items-center mt-auto"
+                         class="battle-unit d-flex flex-column align-items-center"
                          aria-label="Player">
                     <div id="player-sprite-wrapper">
                         <img id="player-sprite"
