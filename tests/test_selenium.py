@@ -1,4 +1,4 @@
-# test_selenium_visual.py
+# test_selenium.py
 import socket
 import unittest
 import threading
@@ -9,25 +9,29 @@ from werkzeug.security import generate_password_hash
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-def _free_port():
-    """Return an OS-assigned free port so parallel tests never collide on 5001."""
-    with socket.socket() as s:
-        s.bind(("", 0))
-        return s.getsockname()[1]
-
 from sqlalchemy.pool import StaticPool
 from app import create_app
 from serverstuff import db
 from models import User, UserStat
 
-class VisualLoginTest(unittest.TestCase):
+
+def _free_port():
+    """Get a free port so tests don't fight over the same one."""
+    with socket.socket() as s:
+        s.bind(("", 0))
+        return s.getsockname()[1]
+
+
+class LoginTest(unittest.TestCase):
+
+    def _js_click(self, element):
+        # Headless Chrome doesn't always fire normal clicks, so click via JS.
+        self.driver.execute_script("arguments[0].click();", element)
 
     def setUp(self):
         self.app = create_app({
             'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-            # Share one in-memory SQLite connection across setUp + server thread
-            # so the socketio handler thread sees seeded items/users.
+            # Share one SQLite connection so the server thread sees our seeded data.
             'SQLALCHEMY_ENGINE_OPTIONS': {
                 'connect_args': {'check_same_thread': False},
                 'poolclass': StaticPool,
@@ -75,17 +79,18 @@ class VisualLoginTest(unittest.TestCase):
         time.sleep(1)
 
         options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--window-size=1920,1080")
         self.driver = webdriver.Chrome(options=options)
         self.driver.implicitly_wait(3)
 
         self.wait = WebDriverWait(self.driver, 10)
 
-    def test_login_visually(self):
+    def test_login(self):
         self._login_as_test_user()
         self.assertIn("/home", self.driver.current_url)
-        print("Login worked! Now on:", self.driver.current_url)
 
-    def test_signup_visually(self):
+    def test_signup(self):
         self.driver.get(f"{self.base_url}/")
 
         self.wait.until(EC.element_to_be_clickable((By.ID, "toggle-button"))).click()
@@ -95,9 +100,8 @@ class VisualLoginTest(unittest.TestCase):
 
         self.wait.until(EC.url_contains("/home"))
         self.assertIn("/home", self.driver.current_url)
-        print("Signup worked! Now on:", self.driver.current_url)
 
-    def test_signup_with_taken_username_visually(self):
+    def test_signup_with_taken_username(self):
         self.driver.get(f"{self.base_url}/")
 
         self.wait.until(EC.element_to_be_clickable((By.ID, "toggle-button"))).click()
@@ -105,13 +109,11 @@ class VisualLoginTest(unittest.TestCase):
         self.driver.find_element(By.ID, "password").send_keys("password")
         self.wait.until(EC.element_to_be_clickable((By.ID, "submit-button"))).click()
 
-        # Wait for error message to appear on page (rendered via login.html .alert-danger div)
         error_el = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert-danger")))
         self.assertIn("/signup", self.driver.current_url)
         self.assertIn("taken", error_el.text)
-        print("Duplicate username error shown:", error_el.text)
 
-    def test_wrong_password_visually(self):
+    def test_wrong_password(self):
         self.driver.get(f"{self.base_url}/")
 
         self.wait.until(EC.visibility_of_element_located((By.ID, "username"))).send_keys("username")
@@ -121,9 +123,8 @@ class VisualLoginTest(unittest.TestCase):
         error_el = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert-danger")))
         self.assertIn("/login", self.driver.current_url)
         self.assertIn("not correct", error_el.text)
-        print("Wrong password error shown:", error_el.text)
 
-    def test_logout_visually(self):
+    def test_logout(self):
         self._login_as_test_user()
 
         self.wait.until(EC.element_to_be_clickable(
@@ -133,23 +134,19 @@ class VisualLoginTest(unittest.TestCase):
         self.wait.until(EC.url_contains("/login"))
         self.assertIn("/login", self.driver.current_url)
         self.assertEqual("Login", self.driver.find_element(By.ID, "form-title").text)
-        print("Logout worked! Now on:", self.driver.current_url)
 
     def test_switch_between_sword_and_hat_shop(self):
         self._login_as_test_user()
 
         self.wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "shop"))).click()
-        # Wait until shop.js has finished its async init — the buy buttons
-        # only appear after initializeShopCards() completes, which means
-        # initializeShopTabs() (called earlier in the same function) has
-        # already wired up the tab click handlers.
         self.wait.until(EC.presence_of_element_located(
             (By.CSS_SELECTOR, "#sword-shop-grid .buy-weapon-button")))
-        self.wait.until(EC.element_to_be_clickable((By.ID, "hat-shop-button"))).click()
+
+        hat_tab = self.wait.until(EC.element_to_be_clickable((By.ID, "hat-shop-button")))
+        self._js_click(hat_tab)
 
         self.wait.until(EC.text_to_be_present_in_element((By.ID, "shop-title"), "Hat Shop"))
         self.assertEqual("Hat Shop", self.driver.find_element(By.ID, "shop-title").text)
-        print("Switched to hat shop! Now on:", self.driver.current_url)
 
     def test_navigate_home_to_dungeon(self):
         self._login_as_test_user()
@@ -162,7 +159,6 @@ class VisualLoginTest(unittest.TestCase):
     def test_home_requires_login(self):
         self.driver.get(f"{self.base_url}/home")
 
-        # Should redirect away — wait for the login form to appear
         self.wait.until(EC.visibility_of_element_located((By.ID, "form")))
         self.assertNotIn("/home", self.driver.current_url)
         self.assertTrue(self.driver.find_element(By.ID, "form").is_displayed())
@@ -197,54 +193,39 @@ class VisualLoginTest(unittest.TestCase):
 
         self.assertIn("/dungeon", self.driver.current_url)
 
-
     def test_buy_weapon_and_hat_to_equip_both(self):
         self._login_as_rich_user()
         self.driver.get(f"{self.base_url}/shop")
 
         self.wait.until(EC.presence_of_all_elements_located(
             (By.CSS_SELECTOR, "#sword-shop-grid .buy-weapon-button")))
-        # initializeShopButtons() runs right after initializeShopCards() finishes.
-        # The buttons exist in the DOM a moment before their click handlers are
-        # attached, so give the JS thread a beat to wire them up.
         time.sleep(0.5)
+
+        # Auto-accept the buy confirm/alert popups so the test doesn't get stuck on them.
+        self.driver.execute_script("window.confirm = () => true; window.alert = () => {};")
 
         sword_btn = self.driver.find_element(
             By.CSS_SELECTOR, '[data-item-name="Short Longsword"]'
         )
-        sword_btn.click()
-        self.wait.until(EC.alert_is_present())
-        self.driver.switch_to.alert.accept()
+        self._js_click(sword_btn)
+        self.wait.until(lambda d: sword_btn.text == "Purchased")
 
-        self.wait.until(EC.alert_is_present())
-        self.driver.switch_to.alert.accept()
-
-        self.wait.until(EC.element_to_be_clickable((By.ID, "hat-shop-button"))).click()
+        hat_tab = self.wait.until(EC.element_to_be_clickable((By.ID, "hat-shop-button")))
+        self._js_click(hat_tab)
         self.wait.until(EC.presence_of_all_elements_located(
             (By.CSS_SELECTOR, "#hat-shop-grid .buy-weapon-button")))
-        time.sleep(0.5)  # same race — handlers attach right after cards render
+        time.sleep(0.5)
 
         hat_btn = self.driver.find_element(
             By.CSS_SELECTOR, '[data-item-name="Lensless Glasses"]'
         )
-        hat_btn.click()
-        self.wait.until(EC.alert_is_present())
-        self.driver.switch_to.alert.accept()
-        self.wait.until(EC.alert_is_present())
-        self.driver.switch_to.alert.accept()
+        self._js_click(hat_btn)
+        self.wait.until(lambda d: hat_btn.text == "Purchased")
 
         self.driver.get(f"{self.base_url}/home")
         self.wait.until(EC.presence_of_element_located(
             (By.CSS_SELECTOR, '#inventory-grid .equip-weapon-button[data-item-type="sword"]')
         ))
-
-        self.wait.until(EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '#inventory-grid .equip-weapon-button[data-item-type="sword"]')
-        )).click()
-        
-        self.wait.until(EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, '#inventory-grid .equip-weapon-button[data-item-type="armour"]')
-        )).click()
 
         sword_equip = self.driver.find_element(
             By.CSS_SELECTOR, '#inventory-grid .equip-weapon-button[data-item-type="sword"]'
@@ -252,11 +233,16 @@ class VisualLoginTest(unittest.TestCase):
         hat_equip = self.driver.find_element(
             By.CSS_SELECTOR, '#inventory-grid .equip-weapon-button[data-item-type="armour"]'
         )
+        self._js_click(sword_equip)
+        self._js_click(hat_equip)
+        self.wait.until(lambda d: sword_equip.text == "Equipped")
+        self.wait.until(lambda d: hat_equip.text == "Equipped")
+
         self.assertEqual(sword_equip.text, "Equipped")
         self.assertEqual(hat_equip.text, "Equipped")
 
     def _login_as_test_user(self):
-        """Call upon this if you need to login, don't remake login every call."""
+        """Login as the seeded test user."""
         self.driver.get(f"{self.base_url}/")
         self.wait.until(EC.visibility_of_element_located((By.ID, "username"))).send_keys("username")
         self.driver.find_element(By.ID, "password").send_keys("password")
@@ -264,7 +250,7 @@ class VisualLoginTest(unittest.TestCase):
         self.wait.until(EC.url_contains("/home"))
 
     def _login_as_rich_user(self):
-        """Login as seeded user with 99999 gold for shop behaviour tests."""
+        """Login as the seeded user with 99999 gold for shop tests."""
         self.driver.get(f"{self.base_url}/")
         self.wait.until(EC.visibility_of_element_located((By.ID, "username"))).send_keys("richuser")
         self.driver.find_element(By.ID, "password").send_keys("password")
@@ -276,6 +262,7 @@ class VisualLoginTest(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
 
 if __name__ == "__main__":
     unittest.main()

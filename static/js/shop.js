@@ -452,7 +452,6 @@ async function initializeShopPage() {
     initializeInspectWeaponButtons();
 
     initializeMysteryBoxButton();
-    initializeShopAddGoldButton();
 }
 
 // Expose a few helpers on window so they can be tested from the browser console.
