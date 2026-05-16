@@ -62,8 +62,93 @@ class UnitTests(unittest.TestCase):
         }, follow_redirects=True)
         self.assertIn(b'not correct', response.data)
 
+    def test_login_after_signup(self):
+        #create user
+        self.client.post('/signup', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        })
+        # login with correct details
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        }, follow_redirects=True)
+        self.assertIn(b'Welcome back, testuser', response.data)  
+        
+    def test_page_redirect_after_login_shop(self):
+        #create user
+        self.client.post('/signup', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        })
+        # login with correct details
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        }, follow_redirects=True)
+        
+        response = self.client.get('/shop')
+        self.assertIn(b'Gear up your cat', response.data)
 
-    # more test to come!
+    def test_page_redirect_after_login_dungeon(self):
+        #create user
+        self.client.post('/signup', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        })
+        # login with correct details
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        }, follow_redirects=True)
+        
+        response = self.client.get('/dungeon')
+        self.assertIn(b'Level', response.data)
+
+    def test_page_redirect_back_to_dashboard_after_login(self):
+
+        self.client.post('/signup', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        })
+        # login with correct details
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'testpass'
+        }, follow_redirects=True)
+
+        response = self.client.get('/shop', 
+        follow_redirects=True)
+        response = self.client.get('/home', 
+        follow_redirects=True)
+        self.assertIn(b'Welcome back, testuser', response.data)
+
+    def test_login_with_nonexistent_user(self):
+        response = self.client.post('/login', data={
+            'username': 'nonexistent',
+            'password': 'nopass'
+        }, follow_redirects=True)
+        self.assertIn(b'not correct', response.data)
+
+    def test_signup_with_empty_username(self):
+        response = self.client.post('/signup', data={
+            'username': '',
+            'password': 'testpass'
+        }, follow_redirects=False)
+
+        # should stay on same page
+        self.assertEqual(response.status_code, 302)
+
+
+    def test_signup_with_empty_password(self):
+        response = self.client.post('/signup', data={
+            'username': 'testuser',
+            'password': ''
+        }, follow_redirects=False)
+
+        # should stay on same page
+        self.assertEqual(response.status_code, 302)
+
 
 if __name__ == '__main__':
     unittest.main()
