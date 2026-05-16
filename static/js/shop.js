@@ -424,8 +424,8 @@ async function initializeShopCards() {
         }
         card.querySelector('.card-image-top').src = item.imgpath;
         card.querySelector('.card-title').textContent = item.name;
-        card.querySelector('.card-text.text-secondary.mb-4').textContent = `Price: ${item.cost}`;
-        card.querySelector(".small.text-secondary.mb-1").textContent = item.description;
+        card.querySelector(".card-text").textContent = `Price: ${item.cost}`;
+        card.querySelector(".inspect-weapon-details .small").textContent = item.description;
         const stat = card.querySelector(".small.fw-semibold.mb-0");
 
 
