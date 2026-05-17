@@ -17,7 +17,7 @@
 
       <!--left window, contains stats-->
       <div class="col-lg-3">
-        <h4 class="text-secondary text-center">stats</h4>
+        <h4 class="text-dark text-center">stats</h4>
         <div class="border border-2 rounded shadow p-2 mb-2 text-center glass-effect">
           <h5 id="username" class="mb-0">{{user}}'s cat</h5>
           <h6 id="lvl-stat" class="mb-0">Level 7</h6>
@@ -46,7 +46,7 @@
           <img class="card-image-top m-3" src="{{ url_for('static', filename='images/catsprite-s.png') }}" alt="an image">
           <div class="card-body d-flex flex-column">
               <h5 class="card-title mb-0">Placeholder</h5>
-              <p class="mt-0 text-secondary statline"></p>
+              <p class="mt-0 text-dark statline"></p>
               <button class="btn btn-primary mt-auto equip-weapon-button" data-cost="" data-item-name="">Equip</button>
           </div>
         </div>
@@ -54,7 +54,7 @@
     
         <!--centre window, for inventory-->
       <div class="col-lg-6 h-100">
-        <h4 class="text-secondary text-center">inventory</h4>
+        <h4 class="text-dark text-center">inventory</h4>
         <div class="border border-2 rounded shadow p-4 text-center glass-effect">
           <div id="inventory-grid" class="inventory-grid row row-cols-1 row-cols-md-2 row-cols-xl-3 overflow-y-auto">
           </div>
@@ -62,10 +62,14 @@
       </div>
               <!--right window, will host leaderboard and perhaps alos-->
       <div class="col-lg-3">
-        <h4 class="text-secondary text-center">Leaderboard</h4>
+        <h4 class="text-dark text-center">Leaderboard</h4>
         
 
         <div id="leaderboard-div"class="border border-2 rounded shadow p-3 mb-2 glass-effect">
+        </div>
+        <h4 class="text-dark text-center">Activity</h4>
+        <div class="border border-2 rounded shadow p-3 text-center mb-2 glass-effect">
+
         </div>
       </div>
 
