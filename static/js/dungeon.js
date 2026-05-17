@@ -485,6 +485,10 @@ function handleEnemyDefeat() {
   dungeonGoldEarned += goldReward;
   gainExperience(xpReward);
   logAction(`Enemy defeated! Gained ${goldReward} gold, ${xpReward} XP.`);
+  chatmsg = dungeonSocketRequest("defeated_monster", {
+  monster: enemy.name
+});
+  console.log(chatmsg);
   player.enemyCount += 1;
   
 
@@ -511,7 +515,9 @@ function handleFlee() {
     logAction("You return to the dungeon...");
     return;
   }
-
+  chatmsg = dungeonSocketRequest("left_dungeon", {
+  gold : dungeonGoldEarned
+  });
   logAction("You fled the dungeon!");
   dungeonGoldEarned = 0;
   player.enemyCount = 0;
