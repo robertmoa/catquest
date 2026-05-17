@@ -52,7 +52,7 @@ def handle_get_monsters(data=None):
 @socketio.on("defeated_monster")
 def handle_monster_defeat(data):
     payload = {
-            "type": "global",
+            "type": "system",
             "from": "Catquest",
             "text": f"{current_user.username} defeated {data["monster"]}!"
         }
@@ -70,7 +70,7 @@ def handle_monster_defeat(data):
 @socketio.on("left_dungeon")
 def handle_monster_defeat(data):
     payload = {
-            "type": "global",
+            "type": "system",
             "from": "Catquest",
             "text": f"{current_user.username} left the dungeon with {data["gold"]} gold!"
         }
