@@ -421,7 +421,7 @@ ARMOUR_DATA = [
         "description": "'It's magical I swear' - the man who sold me the hat.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Magic Man Hat.png",
-        "defense": 4,
+        "defense": 3,
         "dodge_chance": 0.04,
     },
     {
@@ -432,7 +432,7 @@ ARMOUR_DATA = [
             "On second thought, maybe you should EAT this hat\n\nBuy The Crown of Pure Lead for 35 gold?"
         ],
         "imgpath": "/static/images/Hats/Crown Of Pure Lead.png",
-        "defense": 6,
+        "defense": 5,
         "dodge_chance": 0.06,
     },
     {
@@ -441,7 +441,7 @@ ARMOUR_DATA = [
         "description": "You heard it.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Slayer of Gods.png",
-        "defense": 8,
+        "defense": 7,
         "dodge_chance": 0.08,
     },
     {
@@ -450,7 +450,7 @@ ARMOUR_DATA = [
         "description": "Yes this is a hat, yes you wear them on your head.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Pants.png",
-        "defense": 10,
+        "defense": 9,
         "dodge_chance": 0.10,
     },
     {
@@ -461,7 +461,7 @@ ARMOUR_DATA = [
             "I am so sorry for that\n\nBuy the Sigma Alpha Hat for 75 gold?"
         ],
         "imgpath": "/static/images/Hats/Sigma Alpha Hat.png",
-        "defense": 12,
+        "defense": 11,
         "dodge_chance": 0.12,
     },
     {
@@ -470,7 +470,7 @@ ARMOUR_DATA = [
         "description": "This ones not for you, keep on walking pal.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Cool Person Hat.png",
-        "defense": 15,
+        "defense": 13,
         "dodge_chance": 0.15,
     },
     {
@@ -479,7 +479,7 @@ ARMOUR_DATA = [
         "description": "'For entrepeneurs' he whispered quitely and sneakily'",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Teeny Tiny Eenie Weenie Top Hat.png",
-        "defense": 18,
+        "defense": 14,
         "dodge_chance": 0.18,
     },
     {
@@ -494,7 +494,7 @@ ARMOUR_DATA = [
             "Last chance! Can't turn back now",
         ],
         "imgpath": "/static/images/Hats/Hat of Uncertainty.png",
-        "defense": 20,
+        "defense": 25,
         "dodge_chance": 0.20,
     },
 ]
