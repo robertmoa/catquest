@@ -59,7 +59,7 @@ async function loadMonsterPool() {
       {
         name: "Angry Cat",
         entrymsg: "An Angry Cat appears!",
-        imgpath: "/static/images/ecatsprite.png",
+        imgpath: "/static/images/Ecatsprite.png",
         max_hp: 20,
         damage: 4,
         reward: 10,
@@ -91,7 +91,6 @@ const player = {
     charging: 0,
   },
 
-  ownedSkills: [],
   cooldowns: {},
 
   defenceMultActive: 0,
@@ -99,10 +98,6 @@ const player = {
 
   get maxStamina() {
     return 3 + Math.floor(this.level / 2);
-  },
-
-  get hasStamina() {
-    return true;
   },
 
   get critChance() {
@@ -124,7 +119,7 @@ const ACTIONS = {
   },
   heal: {
     id: "heal", name: "Heal",
-    type: "heal", staminaCost: 0, healFlat: 12,
+    type: "heal", staminaCost: 0, healFlat: 0,
     levelReq: 1, isCore: true,
   },
   flee: {
@@ -169,7 +164,7 @@ function createEnemy(enemyNumber) {
   const isBoss = enemyNumber % 10 === 0;
 
   var templateIndex = Math.floor(Math.random() * monsterPool.length);
-  var template = monsterPool[templateIndex] || { name: "Cat", entrymsg: "A cat appears!", imgpath: "/static/images/ecatsprite.png", max_hp: 20, damage: 4, reward: 10 };
+  var template = monsterPool[templateIndex] || { name: "Cat", entrymsg: "A cat appears!", imgpath: "/static/images/Ecatsprite.png", max_hp: 20, damage: 4, reward: 10 };
 
   var hp = template.max_hp
   var attack = template.damage
@@ -645,7 +640,7 @@ function runActionEffect(action) {
     }
 
   } else if (action.type === "heal") {
-    var healAmount = Math.max(14, Math.floor(player.maxHp * 0.35));
+    var healAmount = Math.max(14, Math.floor(player.maxHp * 0.20));
     healUnit(player, healAmount);
     updateHpUI(player, playerHpFill, playerHpText);
     logAction(`You heal for ${healAmount} HP!`);
@@ -668,8 +663,8 @@ function getAvailableActions() {
   CORE_ACTION_ORDER.forEach(id => {
     if (ACTIONS[id]) list.push(ACTIONS[id]);
   });
-  player.ownedSkills.forEach(id => {
-    if (ACTIONS[id]) list.push(ACTIONS[id]);
+  Object.values(ACTIONS).forEach(action => {
+    if (!action.isCore && player.level >= action.levelReq) list.push(action);
   });
   return list;
 }

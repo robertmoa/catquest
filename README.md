@@ -173,7 +173,7 @@ catquest/
 ## Running Tests
 
 ```bash
-python -m unittest tests/test_unit.py
+python -m unittest tests.test_unit
 python -m unittest tests.test_selenium
 ```
 
@@ -251,8 +251,8 @@ socketio.run(app, debug=True, port=5001)
 
 ## Group Members
 
-| Name | Student ID |
-|------|------------|
-| Robert Smart | [24468811] |
-| Lachlan Vaz | [24219564] |
-| Dennis Quek | [23879473] |
+| Name | Student ID | GitHub Username |
+|------|------------|-----------------|
+| Robert Smart | 24468811 | robertmoa |
+| Lachlan Vaz | 24219564 | VazLM |
+| Dennis Quek | 23879473 | dendenpixel |
