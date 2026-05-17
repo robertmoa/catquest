@@ -421,27 +421,6 @@ function enemyAttackPlayer() {
     return;
   }
 
-  // if (enemy.specialType === "sorcerer") {
-  //   if (enemy.status.charging === 0) {
-  //     enemy.status.charging = 1;
-  //     enemy.status.chargePayload = Math.floor(5 + player.level * 2);
-  //     logAction("Sorcerer Cat is channelling a spell...");
-  //     renderStatusDisplay(enemy, "enemy-status-display");
-  //     player.defenceMultActive = 0;
-  //     return;
-  //   } else if (enemy.status.charging > 0) {
-  //     var spellDamage = enemy.status.chargePayload;
-  //     player.currentHp = Math.max(0, player.currentHp - spellDamage);
-  //     updateHpUI(player, playerHpFill, playerHpText);
-  //     logAction("Sorcerer Cat unleashes arcane fire! " + spellDamage + " true damage!");
-  //     enemy.status.charging = 0;
-  //     enemy.status.chargePayload = 0;
-  //     renderStatusDisplay(enemy, "enemy-status-display");
-  //     comboCount = 0;
-  //     player.defenceMultActive = 0;
-  //     return;
-  //   }
-  // }
 
   let defence = player.defense;
   if (player.defenceMultActive) {
