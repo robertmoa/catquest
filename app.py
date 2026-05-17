@@ -11,7 +11,10 @@ def create_app(config=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     if config:
-        app.config.from_object(config)
+        if isinstance(config, dict):
+            app.config.update(config)   # handles dicts
+        else:
+            app.config.from_object(config)
         
     # attach socket and database to app
     db.init_app(app)
