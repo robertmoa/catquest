@@ -133,8 +133,18 @@ catquest-equip/
 ├── shop_sockets.py     # Shop socket events + item seeding
 ├── loginmgmt.py        # Login/logout socket logic
 ├── user_handling.py    # User stat helpers
+├── tests/              # unit and selenium test files
 ├── templates/          # HTML templates
 └── static/             # CSS, JS, images, fonts
+```
+
+---
+
+## Running Tests
+
+```bash
+python -m unittest tests/test_unit.py # Specifically for unit testing for now.
+python -m unittest tests.test_selenium.py
 ```
 
 ---

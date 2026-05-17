@@ -309,19 +309,16 @@ def handle_equip_item(data):
 
 
 
-
-
-
 SWORD_DATA = [
     {
         "name": "Short Longsword",
         "cost": 5,
         "description": "The shortest longsword in all the realms.",
         "specialprompt": [
-            "It may be short, but it has a long name.\n\nBuy Short Longsword for 5 gold?"
+            "It may be short, but it is a long sword at the end of the day.\n\nBuy Short Longsword for 5 gold?"
         ],
         "imgpath": "/static/images/Swords/Short Longsword.png",
-        "attack": 4,
+        "attack": 3,
         "crit_chance": 0.03,
     },
     {
@@ -332,43 +329,43 @@ SWORD_DATA = [
             "I assure you, I am actually above average size AND I am really funny\n\nBuy An Above Average Sized Dagger for 15 gold?"
         ],
         "imgpath": "/static/images/Swords/An Above Average Sized Dagger.png",
-        "attack": 7,
+        "attack": 4,
         "crit_chance": 0.08,
     },
     {
         "name": "Chilly Cutlass",
         "cost": 25,
-        "description": "Cold to the touch, rude to enemies.",
+        "description": "'Really cold' - someone who was hit by the chilly cutlass",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/Chilly Cutlass.png",
-        "attack": 10,
+        "attack": 6,
         "crit_chance": 0.10,
     },
     {
         "name": "Rapier of Death and Despair",
         "cost": 35,
-        "description": "A dramatic blade for dramatic consequences.",
-        "specialprompt": ["A dramatic blade for dramatic consequences\n\nBuy Rapier of Death and Despair for 35 gold?"],
+        "description": "Its evil I've heard",
+        "specialprompt": ["'Hey you, yeah you, I'm talking to you. You suck lol'\n\nBuy Rapier of Death and Despair for 35 gold?"],
         "imgpath": "/static/images/Swords/Rapier of Death and Despair.png",
-        "attack": 14,
+        "attack": 7,
         "crit_chance": 0.12,
     },
     {
         "name": "Sexy Saber",
         "cost": 50,
-        "description": "A blade with confidence and questionable priorities.",
+        "description": "A blade that speaks two languages, English and 'The Drip' - call it Blingual",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/Sexy Saber.png",
-        "attack": 18,
+        "attack": 10,
         "crit_chance": 0.15,
     },
     {
         "name": "ScHIMitar",
         "cost": 65,
-        "description": "Curved, sharp, and 'The man''.",
+        "description": "Curvy, sharp, and 'The man''.",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/ScHIMitar.png",
-        "attack": 23,
+        "attack": 13,
         "crit_chance": 0.17,
     },
     {
@@ -377,7 +374,7 @@ SWORD_DATA = [
         "description": "His brothers name is Dave.",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/Nuclear Flamebringer Deathknife.png",
-        "attack": 30,
+        "attack": 15,
         "crit_chance": 0.20,
     },
     {
@@ -385,25 +382,25 @@ SWORD_DATA = [
         "cost": 100,
         "description": "Trust me, it is really strong wood.",
         "specialprompt": [
-            "Trust me, it's really strong wood\n\nBuy Wooden Sword for 100 gold?"
+            "Like I said, it's really strong wood\n\nBuy Wooden Sword for 100 gold?"
         ],
         "imgpath": "/static/images/Swords/Wooden Sword.png",
-        "attack": 38,
+        "attack": 18,
         "crit_chance": 0.22,
     },
     {
         "name": "Sword of Uncertainty",
         "cost": 1339,
-        "description": "Nobody knows if this is a good idea, especially the sword.",
+        "description": "Not a soul knows if this is a good idea, especially the sword.",
         "specialprompt": [
             "Are you sure you want to purchase this sword",
-            "Youre super certain?",
+            "You're super certain?",
             "But are you really sure? Like deadset you know you want this",
-            "This is your fourth confirmation. You must really want this, right?",
+            "This is my fourth time asking you. You must really want this, right?",
             "Last chance! Theres no going back now",
         ],
         "imgpath": "/static/images/Swords/Sword of Uncertainty.png",
-        "attack": 133,
+        "attack": 100,
         "crit_chance": 0.33,
     },
 ]
@@ -412,7 +409,7 @@ ARMOUR_DATA = [
     {
         "name": "Lensless Glasses",
         "cost": 10,
-        "description": "A classy hat for cats who enter rooms like they own the furniture.",
+        "description": "They're just the frame.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Lensless Glasses.png",
         "defense": 2,
@@ -421,7 +418,7 @@ ARMOUR_DATA = [
     {
         "name": "Magic Man Hat",
         "cost": 20,
-        "description": "Probably magical. Definitely pointy.",
+        "description": "'It's magical I swear' - the man who sold me the hat.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Magic Man Hat.png",
         "defense": 4,
@@ -430,8 +427,10 @@ ARMOUR_DATA = [
     {
         "name": "Crown of Pure Lead",
         "cost": 35,
-        "description": "For the cat who already acts like royalty.",
-        "specialprompt": None,
+        "description": "You should definitely wear this.",
+        "specialprompt": [
+            "On second thought, maybe you should EAT this hat\n\nBuy The Crown of Pure Lead for 35 gold?"
+        ],
         "imgpath": "/static/images/Hats/Crown Of Pure Lead.png",
         "defense": 6,
         "dodge_chance": 0.06,
@@ -439,7 +438,7 @@ ARMOUR_DATA = [
     {
         "name": "Slayer of Gods",
         "cost": 45,
-        "description": "Warm, soft, and very serious about naps.",
+        "description": "You heard it.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Slayer of Gods.png",
         "defense": 8,
@@ -448,7 +447,7 @@ ARMOUR_DATA = [
     {
         "name": "Pants",
         "cost": 60,
-        "description": "Great for treasure hunts and dramatic staring.",
+        "description": "Yes this is a hat, yes you wear them on your head.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Pants.png",
         "defense": 10,
@@ -457,8 +456,10 @@ ARMOUR_DATA = [
     {
         "name": "Sigma Alpha Hat",
         "cost": 75,
-        "description": "A hat for the alpha cat.",
-        "specialprompt": None,
+        "description": "Only the rizziest alpha sigma male lone wolf can wear this hat *howls*",
+        "specialprompt": [
+            "I am so sorry for that\n\nBuy the Sigma Alpha Hat for 75 gold?"
+        ],
         "imgpath": "/static/images/Hats/Sigma Alpha Hat.png",
         "defense": 12,
         "dodge_chance": 0.12,
@@ -466,7 +467,7 @@ ARMOUR_DATA = [
     {
         "name": "Cool Person Hat",
         "cost": 90,
-        "description": "For the coolest cat in town.",
+        "description": "This ones not for you, keep on walking pal.",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Cool Person Hat.png",
         "defense": 15,
@@ -475,7 +476,7 @@ ARMOUR_DATA = [
     {
         "name": "Teeny Tiny Eenie Weenie Top Hat",
         "cost": 100,
-        "description": "Ready for adventure.",
+        "description": "'For entrepeneurs' he whispered quitely and sneakily'",
         "specialprompt": None,
         "imgpath": "/static/images/Hats/Teeny Tiny Eenie Weenie Top Hat.png",
         "defense": 18,
@@ -483,9 +484,15 @@ ARMOUR_DATA = [
     },
     {
         "name": "Hat of Uncertainty",
-        "cost": 120,
-        "description": "Time to party!",
-        "specialprompt": None,
+        "cost": 1339,
+        "description": "No one knows if this is a good idea... buy it.",
+        "specialprompt": [
+            "Are you sure you want to buy this hat",
+            "You're super certain?",
+            "But are you really sure? Super duper certain",
+            "You must really want this",
+            "Last chance! Can't turn back now",
+        ],
         "imgpath": "/static/images/Hats/Hat of Uncertainty.png",
         "defense": 20,
         "dodge_chance": 0.20,
