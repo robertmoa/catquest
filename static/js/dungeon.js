@@ -86,13 +86,12 @@ const player = {
   status: {
     stunned: 0,
     slowed: 0,
-    staggered: 0,
     dot: 0,
     dotDamage: 0,
     charging: 0,
   },
 
-  ownedSkills: ["stagger"],
+  ownedSkills: [],
   cooldowns: {},
 
   defenceMultActive: 0,
@@ -149,11 +148,6 @@ const ACTIONS = {
     type: "shield_break", staminaCost: 3, damageMult: 1.5, defReduction: 0.7,
     levelReq: 8, isCore: false,
   },
-  stagger: {
-    id: "stagger", name: "Stagger",
-    type: "stagger", staminaCost: 1, damageMult: 0.5,
-    levelReq: 1, isCore: false,
-  },
 };
 
 const CORE_ACTION_ORDER = ["attack", "defend", "heal", "flee"];
@@ -182,6 +176,18 @@ function createEnemy(enemyNumber) {
   var defence = 0
   var goldDrop = template.reward
   var xpDrop = Math.floor(template.max_hp/2)
+  // --- Difficulty scaling ---
+  // Scales enemies off BOTH player power (so endgame stays hard)
+  // and dungeon depth (so each run ramps up). Rewards scale to match.
+  var powerIndex = player.attack + (player.maxHp / 10);
+  var powerScale = 1 + (powerIndex / 60);
+  var depthScale = 1 + (player.enemyCount * 0.10);
+  var totalScale = powerScale * depthScale;
+
+  hp       = Math.max(1, Math.floor(hp       * totalScale));
+  attack   = Math.max(1, Math.floor(attack   * totalScale));
+  goldDrop = Math.floor(goldDrop * totalScale);
+  xpDrop   = Math.max(1, Math.floor(xpDrop   * totalScale));
 
   var entrymsg = template.entrymsg;
   var imgpath = template.imgpath;
@@ -215,7 +221,6 @@ function createEnemy(enemyNumber) {
     status: {
       stunned: 0,
       slowed: 0,
-      staggered: 0,
       dot: 0,
       dotDamage: 0,
       charging: 0,
@@ -297,7 +302,6 @@ function renderStatusDisplay(unit, elementId) {
   var parts = [];
   if (unit.status.stunned > 0)    parts.push("Stunned (" + unit.status.stunned + ")");
   if (unit.status.slowed > 0)     parts.push("Slowed (" + unit.status.slowed + ")");
-  if (unit.status.staggered > 0)  parts.push("Staggered (" + unit.status.staggered + ")");
   if (unit.status.charging > 0)   parts.push("Charging... (" + unit.status.charging + ")");
   if (unit.status.dot > 0)        parts.push("Burning (" + unit.status.dot + "t, " + unit.status.dotDamage + "dmg)");
   el.textContent = parts.join(" | ");
@@ -313,7 +317,6 @@ function tickStatus(unit) {
       logAction(unit.name + "'s burn fades.");
     }
   }
-  if (unit.status.staggered > 0) unit.status.staggered -= 1;
 }
 
 function updateBattleUI() {
@@ -637,16 +640,17 @@ function runActionEffect(action) {
     player.defenceMultActive = action.defenceMult;
     if (action.healFlat > 0) {
       healUnit(player, action.healFlat);
-      updateHpUI(player, playerfHpFill, playerHpText);
+      updateHpUI(player, playerHpFill, playerHpText);
       logAction(`${action.name}! Defence x${action.defenceMult}, healed ${action.healFlat} HP.`);
     } else {
       logAction(`${action.name}! Defence x${action.defenceMult} this turn.`);
     }
 
   } else if (action.type === "heal") {
-    healUnit(player, Math.floor(player.maxHp*0.2));
+    var healAmount = Math.max(14, Math.floor(player.maxHp * 0.35));
+    healUnit(player, healAmount);
     updateHpUI(player, playerHpFill, playerHpText);
-    logAction(`You heal for ${player.maxHp*0.2} HP!`);
+    logAction(`You heal for ${healAmount} HP!`);
 
   } else if (action.type === "shield_break") {
     const damage = Math.max(1, Math.floor(player.attack * action.damageMult));
@@ -657,25 +661,6 @@ function runActionEffect(action) {
     logAction(`Shield Break! Enemy defence reduced by 70% for 4 turns!`);
     logAction(`${action.name} hits for ${damage} damage!`);
 
-  } else if (action.type === "stagger") {
-    if (enemy.status.charging > 0) {
-      enemy.status.charging = 0;
-      enemy.status.chargePayload = 0;
-      enemy.status.stunned = 1;
-      logAction("Stagger interrupts the charge! Enemy is stunned!");
-      renderStatusDisplay(enemy, "enemy-status-display");
-      return;
-    }
-    var effectiveMult = action.damageMult;
-    if (player.status.slowed > 0) {
-      player.status.slowed--;
-      effectiveMult *= 0.5;
-      logAction("You are slowed! Attack weakened.");
-    }
-    playerAttack(effectiveMult, action.name);
-    enemy.status.staggered = 1;
-    logAction("Enemy is staggered!");
-    renderStatusDisplay(enemy, "enemy-status-display");
   }
 }
 
@@ -694,7 +679,6 @@ function getAvailableActions() {
 function getButtonClass(action) {
   if (action.type === "attack")       return "btn-outline-danger";
   if (action.type === "shield_break") return "btn-outline-danger";
-  if (action.type === "stagger")      return "btn-outline-info";
   if (action.type === "heal")         return "btn-outline-success";
   if (action.type === "buff")         return "btn-outline-warning";
   return "btn-outline-secondary";
@@ -772,7 +756,7 @@ async function loadPlayerStats() {
   player.level = stat.level;
   player.experience = stat.xp;
   player.enemyCount = 0;
-  player.attack = stat.damage;
+  player.attack = stat.damage + stat.level;
   player.defense = stat.defense;
   //calculation for this is (level * 15) + 20 (20 is base health as u start at 0)
   player.maxHp = (stat.level * 15) + 20;
