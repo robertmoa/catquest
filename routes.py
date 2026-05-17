@@ -48,7 +48,7 @@ def signup():
         new_user_entry = User(username=username,password=pw_hashed)
         db.session.add(new_user_entry)
         db.session.commit()
-        handle_login(username)
+        handle_login(new_user_entry)
         return redirect(url_for("main.home"))
     print("user exists")
     return render_template("login.html", error="This username is taken!")
