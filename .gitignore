@@ -4,3 +4,5 @@ env/
 .env
 .env/
 instance/app.db
+__pycache__/
+*.pyc

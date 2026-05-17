@@ -12,6 +12,7 @@ def load_user(user_id):
 
 def handle_login(user):
     login_user(user)
+    session["username"] = user.username
     session["latest_msgid"] = get_latest_msgid()
     new_chat = ChatHistory(
         from_user="Catquest",

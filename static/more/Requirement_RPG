@@ -24,7 +24,6 @@ Dungeon Actions
 - Defend: temporarily increases defence for the next enemy attack and restores a small amount of HP.
 - Heal: restores 20% of maximum HP.
 - Flee: leaves the current run and begins a new battle with full HP.
-- Stagger: special stamina-based attack.
 - Players use stamina for special actions. Maximum stamina is 3 + floor(level / 2), and stamina regenerates on turns where stamina was not spent.
 - Action buttons can be selected with the keyboard using A and D, then activated with Enter or Space.
 

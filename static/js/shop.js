@@ -19,23 +19,6 @@ async function loadItems() {
     const items = await socketRequest("get_all_items");
     return items;
 }
-// --At the moment this isnt needed, as i have changed it to get the username from the server when it loads the template
-// async function loadUsername() {
-//     const data = await socketRequest("get_user_info");
-
-//     const element = document.getElementById("player-username");
-
-//     if (!element) return;
-
-//     if (!data.success) {
-//         element.textContent = "Not logged in";
-//         return;
-//     }
-// }
-
-//document.addEventListener("DOMContentLoaded", loadUsername);
-
-
 // Gets the player's current gold total from the database.
 async function getPlayerGold() {
     const data = await socketRequest("get_user_stats");
