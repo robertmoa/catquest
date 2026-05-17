@@ -254,5 +254,5 @@ socketio.run(app, debug=True, port=5001)
 | Name | Student ID | GitHub Username |
 |------|------------|-----------------|
 | Robert Smart | 24468811 | robertmoa |
-| Lachlan Vaz | 24219564 | TODO |
-| Dennis Quek | 23879473 | TODO |
+| Lachlan Vaz | 24219564 | VazLM |
+| Dennis Quek | 23879473 | dendenpixel |
