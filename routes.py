@@ -28,10 +28,10 @@ def login():
         
         return redirect(url_for("main.home"))
     return render_template("login.html", error="Username/password is not correct")
-@main.route("/logout")
+@main.route("/logout", methods=["POST"])
 def logout():
     handle_logout()
-    return render_template("login.html")
+    return render_template("login.html", error="Logged Out.")
 
 
 
