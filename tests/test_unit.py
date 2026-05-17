@@ -137,7 +137,8 @@ class UnitTests(unittest.TestCase):
         }, follow_redirects=False)
 
         # should stay on same page
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+    
 
 
     def test_signup_with_empty_password(self):
@@ -147,7 +148,8 @@ class UnitTests(unittest.TestCase):
         }, follow_redirects=False)
 
         # should stay on same page
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        
 
 
 if __name__ == '__main__':
