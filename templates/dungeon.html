@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -27,7 +28,7 @@
                 <section id="battle-log"
                          aria-label="Battle log"
                          class="border border-3 rounded-3 bg-dark text-light p-2 text-center my-2">
-                    <strong class=>BATTLE LOG</strong>
+                    <strong>BATTLE LOG</strong>
                     <div class="battle-log-messages text-start" id="log-messages"></div>
 
                 </section>
@@ -111,7 +112,7 @@
                     </div>
                     
                     <img id="enemy-sprite"
-                         src="{{ url_for('static', filename='images/ecatsprite.png') }}"
+                         src="{{ url_for('static', filename='images/Ecatsprite.png') }}"
                          alt="Enemy cat sprite"
                          class="m-2">
                          
@@ -137,8 +138,7 @@
     </main>
     <div class="row g-4 justify-content-start align-items-center border border-4 m-1 bg-dark">
             
-            <div id="player-actions" class="d-flex w-100 gap-2 m-2"
-                         class="unit-actions d-flex gap-2"
+            <div id="player-actions" class="d-flex w-100 gap-2 m-2 unit-actions"
                          aria-label="Action buttons">
                     </div>
     </div>
@@ -151,13 +151,5 @@
 <script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>
 <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 
-</body>
-</html>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script src="{{ url_for('static', filename='js/connect.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>

@@ -39,6 +39,8 @@ def logout():
 def signup():
     username = request.form.get("username")
     password = request.form.get("password")
+    if username == "" or password == "":
+        return render_template("login.html", error="Username and password cannot be empty.")
     stmt = select(User).where(User.username == username)
     user = db.session.execute(stmt).scalar_one_or_none()
     #this tells us that no user by that name is in User table, thus create it
