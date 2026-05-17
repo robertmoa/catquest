@@ -1,26 +1,78 @@
-Requirement for the rpg, Gameplay Requirements:
-- Player has the ability to click on button called "Enter Dungeon" to enter Dungeon.
-- Clicking "Enter Dungeon" initiates a battle against a random enemy.
-- Battle is turn-based.
-- Player alwaus takes the first turn.
-- Current Available actions are:
-1. Attack
-2. Flee
-- When the player clicks/enters attack, the enemy loses said HP based on current player attack attribute.
-- If enemy survives, enemy attacks & player loses HP based on the enemy attack stat.
-- If enemy dies, player gains random gold & EXP, and another enemy can spawn.
-- If player runs, the dungeon session ends & returns back to main room.
-- If player is defeated, the dungeon session ends, the player loses 30% currently held gold.
+CatQuest RPG Requirements
 
-Leveling system:
-- tbc.
+Core Game Loop
+- Players create an account or log in so their progress can be stored.
+- Players can move between the dashboard, shop, and dungeon from the navigation bar.
+- Opening the dungeon page starts a battle automatically.
+- Battles are turn-based: the player chooses an action first, then the enemy acts if it is still alive.
+- Defeating an enemy gives gold and XP, then another enemy appears automatically.
+- Fleeing ends the current dungeon run, resets the defeated-enemy count, restores the player to full HP, and starts a fresh battle.
+- If the player is defeated, they lose 30% of the gold earned during the current dungeon run.
 
-Enemy generation:
-- tbc.
-UI requirements:
-- Show player sprite & enemt sprite on screen.
-- Show health bar for both.
-- Show current stats.
-- Show a battle log.
-- Keep UI simplistic.
-- Use DOM manipulation only, no React.
+Player Stats and Progression
+- Player progress includes gold, XP, level, equipped weapon, and equipped armour.
+- Player max HP is calculated from level using: (level * 15) + 20.
+- XP needed for the next level is calculated using: 30 * current level.
+- When the player levels up, overflow XP carries over and stamina is fully restored.
+- Player attack comes from the equipped sword, or defaults to 2 with no sword equipped.
+- Player defence comes from the equipped armour, or defaults to 0 with no armour equipped.
+- Critical-hit chance increases with level during dungeon battles.
+- The dashboard shows current gold, level, HP, defence, attack, critical-hit chance, inventory, and the gold leaderboard.
+
+Dungeon Actions
+- Scratch: basic attack.
+- Defend: temporarily increases defence for the next enemy attack and restores a small amount of HP.
+- Heal: restores 20% of maximum HP.
+- Flee: leaves the current run and begins a new battle with full HP.
+- Stagger: special stamina-based attack.
+- Players use stamina for special actions. Maximum stamina is 3 + floor(level / 2), and stamina regenerates on turns where stamina was not spent.
+- Action buttons can be selected with the keyboard using A and D, then activated with Enter or Space.
+
+Enemy System
+- Enemies are loaded from the database.
+- The current enemy pool includes Slime, Zombie Cat, Common Dog, Armoured Dog, Dog Sorcerer, and General Scratch.
+- Each enemy has a name, description, sprite, entry message, HP, damage, reward, and optional special type.
+- Spawned enemies can receive random variants:
+  - Normal: standard stats.
+  - Tough: more HP and defence, less attack.
+  - Quick: less HP and defence, more attack.
+- Every tenth spawned enemy is treated as a boss enemy and can occasionally stun the player.
+
+Shop and Equipment
+- Players can spend gold in the shop on swords and hats.
+- Swords provide attack stats; hats provide defence stats.
+- Purchased items are stored in the player's inventory and cannot be bought twice.
+- Some items use custom confirmation prompts before purchase.
+- Players can inspect shop items to view their description and stats.
+- Players can equip owned swords and hats from the dashboard inventory.
+- The shop includes a Mystery Box that costs 100 gold:
+  - 0.1% chance to award 5000 gold.
+  - 20% chance to award nothing.
+  - Otherwise awards a weighted random gold amount between 50 and 250.
+
+User Interface
+- Dungeon UI shows:
+  - Player and enemy sprites.
+  - Player and enemy HP bars.
+  - Player gold, level, XP, stamina, and enemies defeated.
+  - Current status effects.
+  - Battle log.
+  - Action buttons.
+- Shop UI shows:
+  - Player avatar and current gold.
+  - Sword and hat tabs.
+  - Mystery Box offer.
+  - Item cards with image, price, inspect details, and purchase state.
+- Dashboard UI shows:
+  - Player stats.
+  - Inventory with equip controls.
+  - Top-five gold leaderboard.
+
+Social Features
+- Players can use real-time global chat.
+- Players can send private whispers using: /w username message
+- Chat history is stored and shown again when the page reloads.
+
+Technical Requirements
+- Backend uses Flask, Flask-SocketIO, Flask-SQLAlchemy, and SQLite.
+- Frontend uses HTML, CSS, and vanilla JavaScript with DOM manipulation.
