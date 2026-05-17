@@ -5,6 +5,7 @@ from models import User, UserStat, ChatHistory, UserItem, Sword, Armour, Item
 from shop_sockets import ensure_user_stat
 from sqlalchemy import select, desc
 from flask_login import current_user
+from better_profanity import profanity
 #handles chat messages including whispering
 
 @socketio.on('chatmsg')
@@ -44,7 +45,7 @@ def handle_chatmsg(msg):
             "type": "pm",
             "from": username,
             "to": target_user,
-            "text": text
+            "text": msg_censor(text)
         }
 
         emit('chatmsg', payload, room=target_user)
@@ -55,7 +56,7 @@ def handle_chatmsg(msg):
         payload = {
             "type": "global",
             "from": username,
-            "text": text
+            "text": msg_censor(text)
         }
 
         emit('chatmsg', payload, broadcast=True)
@@ -87,11 +88,15 @@ def get_msgs(data):
         "id": msg.id,
         "from": msg.from_user,
         "to": msg.to_user,
-        "text": msg.message,
+        "text": msg_censor(msg.message),
         "type": msg.message_type,
         })
         
     return payload
+
+def msg_censor(msg):
+    censored = profanity.censor(msg)
+    return censored
 
 @socketio.on("get_user_stats")
 def get_user_stats(data=None):
