@@ -350,7 +350,6 @@ function logAction(message) {
 function levelUp() {
   player.level += 1;
   player.currentStamina = player.maxStamina;
-  player.xp = 0;
   logAction(`Level Up! You are now level ${player.level}.`);
   logAction("Stamina fully restored.");
 
@@ -420,7 +419,6 @@ function enemyAttackPlayer() {
     player.defenceMultActive = 0;
     return;
   }
-
 
   let defence = player.defense;
   if (player.defenceMultActive) {

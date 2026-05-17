@@ -21,7 +21,6 @@ def handle_save_progress(data):
     db.session.commit()
 
     return {"success": True, "xp": user.data.xp, "level": user.data.level}
-@socketio.on("get_stats")
 
 
 @socketio.on("get_monsters")
