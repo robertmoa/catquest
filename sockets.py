@@ -66,6 +66,7 @@ def handle_chatmsg(msg):
         from_user=username,
         to_user=target_user,
         message=text,
+        ### Didnt end up using message_type in the end
         #message_type=msg_type
     )
     db.session.add(new_chat)

@@ -1,8 +1,9 @@
 from flask import session
 from sqlalchemy import select
-from models import User, UserStat, Monster
+from models import User, UserStat, Monster, ChatHistory
 from serverstuff import db, socketio
 from flask_login import current_user
+from flask_socketio import emit
 
 @socketio.on("save_progress")
 def handle_save_progress(data):
@@ -47,6 +48,42 @@ def handle_get_monsters(data=None):
     ]
 
     return {"success": True, "monsters": payload}
+
+@socketio.on("defeated_monster")
+def handle_monster_defeat(data):
+    payload = {
+            "type": "global",
+            "from": "Catquest",
+            "text": f"{current_user.username} defeated {data["monster"]}!"
+        }
+    emit('chatmsg', payload, broadcast=True)
+    new_chat = ChatHistory(
+        from_user=payload["from"],
+        to_user=None,
+        message=payload["text"],
+        message_type="system")
+    db.session.add(new_chat)
+    db.session.commit()
+    return {"success": True}
+
+    
+@socketio.on("left_dungeon")
+def handle_monster_defeat(data):
+    payload = {
+            "type": "global",
+            "from": "Catquest",
+            "text": f"{current_user.username} left the dungeon with {data["gold"]} gold!"
+        }
+
+    emit('chatmsg', payload, broadcast=True)
+    new_chat = ChatHistory(
+        from_user=payload["from"],
+        to_user=None,
+        message=payload["text"],
+        message_type="system")
+    db.session.add(new_chat)
+    db.session.commit()
+    return {"success": True}
 
 MONSTER_DATA = [
     {
