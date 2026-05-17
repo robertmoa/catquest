@@ -1,5 +1,5 @@
 from flask import Flask
-from serverstuff import socketio, db,login_manager
+from serverstuff import socketio, db, login_manager, csrf
 from routes import main
 from shop_sockets import shop
 from flask_migrate import Migrate
@@ -22,6 +22,7 @@ def create_app(config=None):
     login_manager.login_view = "main.login_page"
 
     db.init_app(app)
+    csrf.init_app(app)
     migrate = Migrate(app,db)
     migrate.init_app(app)
     socketio.init_app(app)
