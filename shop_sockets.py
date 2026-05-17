@@ -371,7 +371,7 @@ SWORD_DATA = [
             "It may be short, but it is a long sword at the end of the day.\n\nBuy Short Longsword for 5 gold?"
         ],
         "imgpath": "/static/images/Swords/Short Longsword.png",
-        "attack": 2,
+        "attack": 3,
         "crit_chance": 0.03,
     },
     {
@@ -388,7 +388,7 @@ SWORD_DATA = [
     {
         "name": "Chilly Cutlass",
         "cost": 25,
-        "description": "'Really damn cold' - someone who was hit by the chilly cutlass",
+        "description": "'Really cold' - someone who was hit by the chilly cutlass",
         "specialprompt": None,
         "imgpath": "/static/images/Swords/Chilly Cutlass.png",
         "attack": 6,
