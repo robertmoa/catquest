@@ -19,7 +19,7 @@ def create_app(config=None):
     # attach socket, login manager and database to server.
     
     login_manager.init_app(app)
-    login_manager.login_view = ""
+    login_manager.login_view = "main.login_page"
 
     db.init_app(app)
     migrate = Migrate(app,db)
