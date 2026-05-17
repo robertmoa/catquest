@@ -1,96 +1,160 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CatQuest - Dungeon</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dungeon.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
 </head>
+
 <body>
-    {% include 'navbar.html' %}
 
-    <div class="battle-page">
-        <main id="battle-area" class="border border-4 border-light-subtle rounded-3" aria-label="Dungeon battle area">
-            <section id="battle-log" aria-label="Battle log">
-                <div class="battle-log-messages" id="log-messages"></div>
-            </section>
-            <section id="player-unit" class="battle-unit" aria-label="Player">
+{% include 'navbar.html' %}
+
+<div class="container-fluid">
+
+    <main id="battle-area"
+          class="border border-4 border-dark rounded-3 px-3 "
+          aria-label="Dungeon battle area">
+
+        <div class="row g-1">
+
+           
+            <div class="col-lg-3 d-flex flex-column">
+
+                <section id="battle-log"
+                         aria-label="Battle log"
+                         class="border border-3 rounded-3 bg-dark text-light p-2 text-center my-2">
+                    <strong class=>BATTLE LOG</strong>
+                    <div class="battle-log-messages text-start" id="log-messages"></div>
+
+                </section>
                 <div id="player-hud-wrapper">
-                <div id="player-hud" class="unit-panel">
-                    <div class="stats-row">
-                        <span class="stat-label">HP</span>
-                        <span id="player-hp-text" class="stat-value">30 / 30</span>
-                    </div>
-                    <div class="hp-bar-bg" aria-hidden="true">
-                        <div id="player-hp-fill" class="hp-bar-fill"></div>
-                    </div>
-                    <div id="player-status-display" style="min-height: 20px; font-size: 0.8em; color: gold;"></div>
 
-                    <div class="stats-row" style="margin-top: 8px;">
-                        <span class="stat-label">Gold</span>
-                        <span id="player-gold" class="stat-value">0</span>
+                        <div id="player-hud" class="unit-panel border border-3 rounded-3 bg-dark text-light w-100 p-2">
+                            <div class="stats-row">
+                                <span>Gold</span>
+                                <span id="player-gold">0</span>
+                            </div>
+                            <div class="stats-row">
+                                <span>HP</span>
+                                <span id="player-hp-text">30 / 30</span>
+                            </div>
+
+                            <div class="hp-bar-bg">
+                                <div id="player-hp-fill" class="hp-bar-fill"></div>
+                            </div>
+
+                            <div id="player-status-display"
+                                 style="min-height: 20px; font-size: 0.8em; color: gold;">
+                            </div>
+
+
+
+                            <div class="stats-row">
+                                <span>Level</span>
+                                <span id="player-level">1</span>
+                            </div>
+
+                            <div class="stats-row">
+                                <span>XP</span>
+                                <span id="player-xp">0 / 50</span>
+                            </div>
+
+                            <div class="xp-bar-bg">
+                                <div id="player-xp-fill" class="xp-bar-fill"></div>
+                            </div>
+
+
+
+                            <div class="stats-row" id="stamina-row">
+                                <span>Stamina</span>
+                                <span id="player-stamina">0 / 0</span>
+                            </div>
+
+                            <div class="stats-row">
+                                <span>Enemies Defeated</span>
+                                <span id="enemy-count">0</span>
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="stats-row" style="margin-top: 8px;">
-                        <span class="stat-label">Level</span>
-                        <span id="player-level" class="stat-value">1</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stat-label">XP</span>
-                        <span id="player-xp" class="stat-value">0 / 50</span>
-                    </div>
-                    <div class="xp-bar-bg" aria-hidden="true">
-                        <div id="player-xp-fill" class="xp-bar-fill"></div>
-                    </div>
+            </div>
 
-                    <div class="stats-row" style="margin-top: 8px;">
-                        <span class="stat-label">Attack</span>
-                        <span id="player-attack" class="stat-value">5</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stat-label">Defence</span>
-                        <span id="player-defence" class="stat-value">0</span>
-                    </div>
-                    <div class="stats-row" id="crit-row">
-                        <span class="stat-label">Crit Rate</span>
-                        <span id="player-crit" class="stat-value">0%</span>
-                    </div>
-                    <div class="stats-row" id="stamina-row">
-                        <span class="stat-label">Stamina</span>
-                        <span id="player-stamina" class="stat-value">0 / 0</span>
-                    </div>
-                    <div class="stats-row">
-                        <span class="stat-label">Enemies Defeated</span>
-                        <span id="enemy-count" class="stat-value">0</span>
-                    </div>
-                </div>
+            <!-- ================= CENTER (BATTLE FIELD) ================= -->
+            <div class="col-lg-6 d-flex flex-column align-items-center justify-content-center gap-4 overflow-hidden">
 
-                <img id="player-sprite" src="{{ url_for('static', filename='images/catsprite-s.png') }}" alt="Player cat sprite">
+                <!-- ENEMY -->
+                <section id="enemy-unit"
+                         class="d-flex battle-unit flex-column align-items-center justify-content-center"
+                         aria-label="Enemy">
 
-                <div id="player-actions" class="unit-actions" aria-label="Action buttons">
-                    <!-- Buttons rendered dynamically by dungeon.js -->
-                </div>
-                </div>
-            </section>
+                    <div id="enemy-hud" class="unit-panel">
 
-            <section id="enemy-unit" class="battle-unit" aria-label="Enemy">
-                <div id="enemy-hud" class="unit-panel">
-                    <div id="enemy-status-display" style="min-height: 20px; font-size: 0.8em; color: gold; text-align: center;"></div>
-                    <div class="hp-row">
-                        <span class="hp-label" id="enemy-name">Angry Cat #1</span>
-                        <span id="enemy-hp-text" class="hp-text">20 / 20</span>
+                        <div id="enemy-status-display"
+                             style="min-height: 20px; font-size: 0.8em; color: gold; text-align: center;">
+                        </div>
+
+                        <div class="d-flex bg-dark border border-2 rounded-3 text-light px-2">
+                            <span id="enemy-name" class="px-2">Angry Cat #1</span>
+                            <span id="enemy-hp-text">20 / 20</span>
+                        </div>
+
+                        <div class="hp-bar-bg">
+                            <div id="enemy-hp-fill" class="hp-bar-fill"></div>
+                        </div>
+
                     </div>
-                    <div class="hp-bar-bg" aria-hidden="true">
-                        <div id="enemy-hp-fill" class="hp-bar-fill"></div>
+                    
+                    <img id="enemy-sprite"
+                         src="{{ url_for('static', filename='images/ecatsprite.png') }}"
+                         alt="Enemy cat sprite"
+                         class="m-2">
+                         
+                    
+
+                </section>
+
+                <!-- PLAYER -->
+                <section id="player-unit"
+                         class="battle-unit d-flex flex-column align-items-center"
+                         aria-label="Player">
+                    <div id="player-sprite-wrapper">
+                        <img id="player-sprite"
+                         src="{{ url_for('static', filename='images/catsprite-n.png') }}"
+                         alt="Player cat sprite">
                     </div>
-                </div>
-                <img id="enemy-sprite" src="{{ url_for('static', filename='images/ecatsprite.png') }}" alt="Enemy cat sprite">
-            </section>
-        </main>
+                </section>
+            </div>
+            
+
+        </div>
+        
+    </main>
+    <div class="row g-4 justify-content-start align-items-center border border-4 m-1 bg-dark">
+            
+            <div id="player-actions" class="d-flex w-100 gap-2 m-2"
+                         class="unit-actions d-flex gap-2"
+                         aria-label="Action buttons">
+                    </div>
     </div>
 
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/connect.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+</body>
+</html>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="{{ url_for('static', filename='js/connect.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dungeon.js') }}"></script>

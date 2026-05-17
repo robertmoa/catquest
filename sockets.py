@@ -1,7 +1,7 @@
 from flask_socketio import emit
 from serverstuff import socketio, users, db
 from flask import request,session
-from models import User, UserStat, ChatHistory, UserItem, Sword, Armour
+from models import User, UserStat, ChatHistory, UserItem, Sword, Armour, Item
 from shop_sockets import ensure_user_stat
 from sqlalchemy import select, desc
 from flask_login import current_user
@@ -96,17 +96,39 @@ def get_msgs(data):
 @socketio.on("get_user_stats")
 def get_user_stats(data=None):
     user = current_user
-
-    # make sure UserStat exists
+    noitems = False
+    # Means a new user
     if user.data is None:
         user.data = UserStat(gold=0, xp=0, level=0)
+        noitems = True
         db.session.commit()
+
+
+    if noitems == True or user.data.equipped_weapon == None:
+        attack = 2
+        crit_chance = 0
+    else:
+        weapon = db.session.get(Item, user.data.equipped_weapon)
+        attack = weapon.attack
+        crit_chance = weapon.crit_chance
+
+    if noitems == True or user.data.equipped_armour == None:    
+        defense = 0
+      
+    else:
+        
+        hat = db.session.get(Item, user.data.equipped_armour)
+        defense = hat.defense
 
     return {
         "success": True,
         "gold": user.data.gold,
         "xp": user.data.xp,
-        "level": user.data.level
+        "level": user.data.level,
+        "damage": attack,
+        "crit_chance": crit_chance,
+        "defense": defense,
+
     }
 
 @socketio.on("get_user_info")
