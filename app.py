@@ -1,5 +1,5 @@
 from flask import Flask
-from serverstuff import socketio, db
+from serverstuff import socketio, db,login_manager
 from routes import main
 from shop_sockets import shop
 from flask_migrate import Migrate
@@ -16,12 +16,16 @@ def create_app(config=None):
         else:
             app.config.from_object(config)
         
-    # attach socket and database to app
+    # attach socket, login manager and database to server.
+    
+    login_manager.init_app(app)
+    login_manager.login_view = ""
+
     db.init_app(app)
     migrate = Migrate(app,db)
     migrate.init_app(app)
     socketio.init_app(app)
-    # register the routes
+    # register relevant blueprints for the game
     app.register_blueprint(main)
     app.register_blueprint(shop)
 

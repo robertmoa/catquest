@@ -2,17 +2,13 @@ from flask import session
 from sqlalchemy import select
 from models import User, UserStat, Monster
 from serverstuff import db, socketio
+from flask_login import current_user
 
 @socketio.on("save_progress")
 def handle_save_progress(data):
-    username = session.get("username")
 
-    if username is None:
-        return {"success": False, "error": "Not logged in"}
 
-    user = db.session.execute(
-        select(User).where(User.username == username)
-    ).scalar_one_or_none()
+    user = current_user
 
     if user is None:
         return {"success": False, "error": "User not found"}
