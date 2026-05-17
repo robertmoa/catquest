@@ -20,6 +20,7 @@
         <ul class="navbar-nav px-3">
           <li class="nav-item">
             <form action="{{ url_for('main.logout') }}" method="POST" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               <button type="submit" class="btn btn-secondary">
                 Logout
               </button>
