@@ -59,7 +59,21 @@ pip install -r static\more\requirements.txt
 pip install -r static/more/requirements.txt
 ```
 
-### 4. Set up the database (first time only)
+### 4. Set a secret key
+
+CatQuest uses Flask sessions, so each local setup needs its own secret key.
+
+**Windows PowerShell:**
+```powershell
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**Mac/Linux:**
+```bash
+export SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
+```
+
+### 5. Set up the database (first time only)
 
 **Windows:**
 ```bash
@@ -71,7 +85,7 @@ python create_db.py
 python3 create_db.py
 ```
 
-### 5. Run the app
+### 6. Run the app
 
 **Windows:**
 ```bash
@@ -96,6 +110,7 @@ cd catquest
 python -m venv venv
 venv\Scripts\activate
 pip install -r static\more\requirements.txt
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
 python create_db.py
 python app.py
 ```
@@ -107,6 +122,7 @@ cd catquest
 python3 -m venv venv
 source venv/bin/activate
 pip install -r static/more/requirements.txt
+export SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
 python3 create_db.py
 python3 app.py
 ```
@@ -120,12 +136,14 @@ If you've already run `create_db.py` before, just do:
 **Windows:**
 ```bash
 venv\Scripts\activate
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_hex(32))"
 python app.py
 ```
 
 **Mac/Linux:**
 ```bash
 source venv/bin/activate
+export SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_hex(32))')"
 python app.py
 ```
 

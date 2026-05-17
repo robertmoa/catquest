@@ -3,18 +3,25 @@ from serverstuff import socketio, db,login_manager
 from routes import main
 from shop_sockets import shop
 from flask_migrate import Migrate
+from config import Config
 
 def create_app(config=None):
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = "secret!"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_object(Config)
 
     if config:
         if isinstance(config, dict):
             app.config.update(config)   # handles dicts
         else:
             app.config.from_object(config)
+
+    if not app.config.get("SECRET_KEY"):
+        if app.config.get("TESTING"):
+            app.config["SECRET_KEY"] = "test-secret"
+        else:
+            raise RuntimeError(
+                "SECRET_KEY is not set. Set the SECRET_KEY environment variable before running CatQuest."
+            )
         
     # attach socket, login manager and database to server.
     
